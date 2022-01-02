@@ -5,7 +5,8 @@
 
 * 💬 基本聊天吹水；
 * 🧧 自动化抢红包（脚本哥）
-
+    * 心跳红包防止踩坑
+    * 心跳红包风险预测
 
 ## 效果
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-4827afbc.png)
