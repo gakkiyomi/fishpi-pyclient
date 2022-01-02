@@ -42,7 +42,6 @@ def init():
         HEARTBEAT_SMART_MODE = config.getboolean('redPacket','heartbeatSmartMode')
         HEARTBEAT_ADVENTURE = config.getboolean('redPacket','heartbeatAdventure')
         HEARTBEAT_THRESHOLD = config.getfloat('redPacket', 'heartbeatThreshold')
-        print(str(HEARTBEAT_THRESHOLD))
         if HEARTBEAT_THRESHOLD < 0:
             HEARTBEAT_THRESHOLD == 0.4
         elif HEARTBEAT_THRESHOLD >1:
