@@ -161,11 +161,14 @@ def renderMsg(message):
             else:
                 print('红包助手: '+sender+'发送了一个红包 你错过了这个红包，请开启抢红包模式！')    
         else:
+            time = message['time']
             user = message['userName']
             if user == USERNAME:
-                print('\t\t\t\t\t\t' + '你说:' + message['md'])
-            else:    
-                print(message['userName']+ '说:' )
+                print('\t\t\t\t\t\t[' + time +']')
+                print('\t\t\t\t\t\t你说: ' + message['md'])
+            else:
+                print('[' + time +']')
+                print(user + '说:' )
                 print(message['md'])
                 print('\r\n')
 
