@@ -1,5 +1,4 @@
 
-from os import system
 import requests
 import hashlib
 import json
@@ -63,10 +62,11 @@ def login(user,password):
     body = json.loads(resp.text)
 
     if body['code'] == 0:
-        print("登陆成功 Key:" + body['Key'])
+        print("登陆成功 欢迎" + USERNAME + '进入聊天室!')
+        print("更多功能与趣味游戏请访问网页端: " + HOST)
         API_KEY = body['Key']
     else:
-        printl("登陆失败: " + body['msg'])
+        print("登陆失败: " + body['msg'])
         sys.exit(1)
 
 
@@ -101,21 +101,21 @@ def analyzeHeartbeatRedPacket(red_packet_id):
     res = json.loads(resp.text)
     for data in res['data']:
         if data['oId'] == red_packet_id:
-           analyze(json.loads(data['content']),red_packet_id,data['time'])
+           analyze(json.loads(data['content']),red_packet_id,data['time'],data['userName'])
            return
     print("红包助手: 你与此红包无缘")         
 
-def analyze(redPacket,red_packet_id,redPacketCreateTime):
+def analyze(redPacket,red_packet_id,redPacketCreateTime,sender):
     count = redPacket['count']
     got = redPacket['got']
     if redPacket['count'] == redPacket['got']:
-        print("红包助手: 遗憾，比别人慢了一点点，建议换宽带!")
+        print('红包助手: '+sender+' 发送的心跳红包, 遗憾没有抢到，比别人慢了一点点，建议换宽带!')
         return
 
     probability = 1 / (count - got)
     for get in redPacket['who']:
         if get['userMoney'] > 0:
-           print("红包助手: 此心跳红包已无效，智能跳坑！")
+           print('红包助手: '+sender+' 发送的心跳红包已无效，智能跳坑！')
            return   
     print('红包助手: 此心跳红包的中奖概率为:'+str(probability))    
     if probability >= HEARTBEAT_THRESHOLD:
@@ -135,29 +135,43 @@ def analyze(redPacket,red_packet_id,redPacketCreateTime):
 
 rel.safe_read()
 
+def renderRedPacket(redPacket):
+    sender = redPacket['userName']
+    content = json.loads(redPacket['content'])
+    if content['type'] == 'heartbeat':
+        if HEARTBEAT:
+            if HEARTBEAT_SMART_MODE:
+                print('红包助手: ' + sender +' 发了一个心跳红包') 
+                analyzeHeartbeatRedPacket(redPacket['oId'])
+                return
+            openRedPacket(redPacket['oId'])
+        else:
+            print('红包助手: '+sender+' 发送了一个心跳红包, 你跳过了这个心跳红包！不尝试赌一下人品吗？')
+    else:
+        print('红包助手: '+sender+' 发送了一个红包, 但社区规定，助手抢红包要等'+str(RATE)+'秒哦～')
+        time.sleep(RATE)
+        openRedPacket(redPacket['oId'])
+
+def renderMsg(message):
+    if message['type'] == 'msg':
+        if message['content'].find("redPacket") != -1:
+            sender = message['userName']
+            if(RED_PACKET_SWITCH):
+                renderRedPacket(message)
+            else:
+                print('红包助手: '+sender+'发送了一个红包 你错过了这个红包，请开启抢红包模式！')    
+        else:
+            user = message['userName']
+            if user == USERNAME:
+                print('\t\t\t\t\t\t' + '你说:' + message['md'])
+            else:    
+                print(message['userName']+ '说:' )
+                print(message['md'])
+                print('\r\n')
+
 def on_message(ws, message):
     json_body = json.loads(message)
-    if json_body['type'] == 'msg':
-        if json_body['content'].find("redPacket") != -1:
-            if(RED_PACKET_SWITCH):
-                content = json.loads(json_body['content'])
-                if content['type'] == 'heartbeat':
-                    if HEARTBEAT:
-                        if HEARTBEAT_SMART_MODE:
-                            analyzeHeartbeatRedPacket(json_body['oId'])
-                            return
-                        openRedPacket(json_body['oId'])
-                    else:
-                        print('红包助手: 你跳过了一个心跳红包！不尝试赌一下人品吗？')
-                else:
-                    print('红包助手: 社区规定，助手抢红包要等'+str(RATE)+'秒哦～')
-                    time.sleep(RATE)
-                    openRedPacket(json_body['oId'])
-            else:
-                print("红包助手: 你错过了一个红包，请开启抢红包模式！")    
-        else:
-            print(json_body['userName']+ '说:' )
-            print(json_body['md'])
+    renderMsg(json_body)
     
 def on_error(ws, error):
     print(error)
@@ -168,11 +182,9 @@ def on_close(ws, close_status_code, close_msg):
 def heartbeat(ws):
     while True:
         time.sleep(180)
-        print("### heartbeat")
         ws.send("-hb-")
 
 def on_open(ws):
-    print("Opened connection")
     _thread.start_new_thread(heartbeat, (ws,))
 
 if __name__ == "__main__":
