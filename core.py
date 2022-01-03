@@ -96,10 +96,12 @@ def openRedPacket(red_packet_id):
     print("红包助手: 遗憾，比别人慢了一点点，建议换宽带!")        
     return 0
 
-def analyzeHeartbeatRedPacket(red_packet_id):
+def more():
     resp = requests.get(HOST + "/chat-room/more?page=1",headers={'User-Agent': UA})
-    res = json.loads(resp.text)
-    for data in res['data']:
+    return json.loads(resp.text)
+
+def analyzeHeartbeatRedPacket(red_packet_id):
+    for data in more()['data']:
         if data['oId'] == red_packet_id:
            analyze(json.loads(data['content']),red_packet_id,data['time'],data['userName'])
            return
@@ -193,6 +195,7 @@ def on_open(ws):
 if __name__ == "__main__":
     init()
     login(USERNAME,PASSWORD)
+    more()
     _thread.start_new_thread(sysIn,())
     websocket.enableTrace(False)
     ws = websocket.WebSocketApp("wss://pwl.icu/chat-room-channel?apiKey="+API_KEY,
