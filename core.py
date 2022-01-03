@@ -27,6 +27,15 @@ RATE = 3
 USERNAME = ''
 PASSWORD = ''
 
+HELP = '输入help获得命令提示列表'
+
+
+COMMAND_GUIDE = '''[checked] 查看当前是否签到
+[reward] 领取昨日活跃奖励
+[point] 查看当前个人积分
+[liveness] 查看当前活跃度(⚠️慎用，如果频繁请求此命令(最少间隔30s)，登录状态会被直接注销,需要重启脚本！)
+'''
+
 
 def init():
     global USERNAME,PASSWORD,HEARTBEAT,RED_PACKET_SWITCH,RATE,HEARTBEAT_SMART_MODE,HEARTBEAT_THRESHOLD,HEARTBEAT_TIMEOUT,HEARTBEAT_ADVENTURE
@@ -69,11 +78,43 @@ def login(user,password):
         print("登陆失败: " + body['msg'])
         sys.exit(1)
 
+def getUserInfo(username):
+    resp = requests.get(HOST + '/user/'+username+'?apiKey='+API_KEY,headers={'User-Agent': UA})
+    return json.loads(resp.text)
+
+def checkedStatus():
+    resp = requests.get(HOST + '/user/checkedIn?apiKey='+API_KEY,headers={'User-Agent': UA})
+    return json.loads(resp.text)
+
+def getYesterdayReward():
+    resp = requests.get(HOST + '/activity/yesterday-liveness-reward-api?apiKey='+API_KEY,headers={'User-Agent': UA})
+    return json.loads(resp.text)
+
+def getlivenessInfo():
+    resp = requests.get(HOST + '/user/liveness?apiKey='+API_KEY,headers={'User-Agent': UA})
+    return json.loads(resp.text) 
 
 def sysIn():
     while True:
       msg = input("")
-      sendMsg(msg)       
+      if msg == 'help':
+        print(COMMAND_GUIDE)
+      elif msg == 'checked':
+          if checkedStatus()['checkedIn']:
+               print('今日你已签到！')  
+          else:
+               print('今日还未签到，摸鱼也要努力呀！')  
+      elif msg == 'reward':
+          if getYesterdayReward()['sum'] == -1:
+               print('你已经领取过昨日活跃度奖励了')  
+          else:
+               print('领取昨日活跃度奖励 积分: ' + str(getYesterdayReward()['sum'])) 
+      elif msg == 'liveness':
+           print('当前活跃度: '+ str(getlivenessInfo()['liveness']))
+      elif msg == 'point':
+           print('当前积分: '+ str(getUserInfo(USERNAME)['userPoint']))     
+      else:    
+        sendMsg(msg)       
     
     
 def sendMsg(message):
@@ -195,8 +236,8 @@ def on_open(ws):
 if __name__ == "__main__":
     init()
     login(USERNAME,PASSWORD)
-    more()
     _thread.start_new_thread(sysIn,())
+    print(HELP)
     websocket.enableTrace(False)
     ws = websocket.WebSocketApp("wss://pwl.icu/chat-room-channel?apiKey="+API_KEY,
                               on_open=on_open,
