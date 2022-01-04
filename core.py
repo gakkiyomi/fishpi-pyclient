@@ -6,6 +6,7 @@ import websocket
 import rel
 import ssl
 import _thread
+import threading
 import time
 import configparser
 import sys
@@ -23,6 +24,8 @@ HEARTBEAT_THRESHOLD = 0.5
 HEARTBEAT_ADVENTURE = False
 HEARTBEAT_TIMEOUT = 5
 MAX_HEARTBEAT_TIMEOUT = 20
+REPEAT_MODE = False
+REPEAT_FREQUENCY = 3
 RATE = 3
 USERNAME = ''
 PASSWORD = ''
@@ -36,9 +39,13 @@ COMMAND_GUIDE = '''[checked] 查看当前是否签到
 [liveness] 查看当前活跃度(⚠️慎用，如果频繁请求此命令(最少间隔30s)，登录状态会被直接注销,需要重启脚本！)
 '''
 
+REPEAT_POOL = {} #复读池
+REPEAT_MSG = ''
+
+threadLock = threading.Lock()
 
 def init():
-    global USERNAME,PASSWORD,HEARTBEAT,RED_PACKET_SWITCH,RATE,HEARTBEAT_SMART_MODE,HEARTBEAT_THRESHOLD,HEARTBEAT_TIMEOUT,HEARTBEAT_ADVENTURE
+    global USERNAME,PASSWORD,HEARTBEAT,RED_PACKET_SWITCH,RATE,HEARTBEAT_SMART_MODE,HEARTBEAT_THRESHOLD,HEARTBEAT_TIMEOUT,HEARTBEAT_ADVENTURE,REPEAT_FREQUENCY,REPEAT_MODE,REPEAT_MSG
     config = configparser.ConfigParser()
     try:
         config.read('./config.ini', encoding='utf-8')
@@ -59,7 +66,8 @@ def init():
             HEARTBEAT_THRESHOLD == MAX_HEARTBEAT_TIMEOUT
         elif HEARTBEAT_THRESHOLD < 0:
             HEARTBEAT_THRESHOLD == 5
-        
+        REPEAT_MODE = config.getboolean('chat','repeatMode')
+        REPEAT_FREQUENCY = config.getint('chat','repeatFrequency')
     except:
         print("请检查配置文件是否合法")
         sys.exit(1)
@@ -214,6 +222,16 @@ def renderMsg(message):
                 print(user + '说:' )
                 print(message['md'])
                 print('\r\n')
+            if REPEAT_MODE:
+                msg = message['md']
+                if REPEAT_POOL.__contains__(msg) == False:
+                    REPEAT_POOL.clear()
+                    REPEAT_POOL[msg] = 1
+                elif REPEAT_POOL[msg] == REPEAT_FREQUENCY:
+                    sendMsg(msg)
+                    REPEAT_POOL[msg] = REPEAT_POOL[msg] + 1 
+                else:
+                    REPEAT_POOL[msg] = REPEAT_POOL[msg] + 1 
 
 def on_message(ws, message):
     json_body = json.loads(message)
