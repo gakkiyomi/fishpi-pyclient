@@ -6,7 +6,6 @@ import websocket
 import rel
 import ssl
 import _thread
-import threading
 import time
 import configparser
 import sys
@@ -40,12 +39,9 @@ COMMAND_GUIDE = '''[checked] 查看当前是否签到
 '''
 
 REPEAT_POOL = {} #复读池
-REPEAT_MSG = ''
-
-threadLock = threading.Lock()
 
 def init():
-    global USERNAME,PASSWORD,HEARTBEAT,RED_PACKET_SWITCH,RATE,HEARTBEAT_SMART_MODE,HEARTBEAT_THRESHOLD,HEARTBEAT_TIMEOUT,HEARTBEAT_ADVENTURE,REPEAT_FREQUENCY,REPEAT_MODE,REPEAT_MSG
+    global USERNAME,PASSWORD,HEARTBEAT,RED_PACKET_SWITCH,RATE,HEARTBEAT_SMART_MODE,HEARTBEAT_THRESHOLD,HEARTBEAT_TIMEOUT,HEARTBEAT_ADVENTURE,REPEAT_FREQUENCY,REPEAT_MODE
     config = configparser.ConfigParser()
     try:
         config.read('./config.ini', encoding='utf-8')
@@ -203,6 +199,16 @@ def renderRedPacket(redPacket):
         time.sleep(RATE)
         openRedPacket(redPacket['oId'])
 
+def repeat(msg):
+    if REPEAT_POOL.__contains__(msg) == False:
+        REPEAT_POOL.clear()
+        REPEAT_POOL[msg] = 1
+    elif REPEAT_POOL[msg] == REPEAT_FREQUENCY:
+        sendMsg(msg)
+        REPEAT_POOL[msg] = REPEAT_POOL[msg] + 1 
+    else:
+        REPEAT_POOL[msg] = REPEAT_POOL[msg] + 1 
+            
 def renderMsg(message):
     if message['type'] == 'msg':
         if message['content'].find("redPacket") != -1:
@@ -224,14 +230,7 @@ def renderMsg(message):
                 print('\r\n')
             if REPEAT_MODE:
                 msg = message['md']
-                if REPEAT_POOL.__contains__(msg) == False:
-                    REPEAT_POOL.clear()
-                    REPEAT_POOL[msg] = 1
-                elif REPEAT_POOL[msg] == REPEAT_FREQUENCY:
-                    sendMsg(msg)
-                    REPEAT_POOL[msg] = REPEAT_POOL[msg] + 1 
-                else:
-                    REPEAT_POOL[msg] = REPEAT_POOL[msg] + 1 
+                repeat(msg)
 
 def on_message(ws, message):
     json_body = json.loads(message)
