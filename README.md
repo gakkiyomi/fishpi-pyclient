@@ -38,3 +38,8 @@ pip install -r requirements.txt
 python core.py
 ~~~
 
+后台执行
+~~~bash
+nohup python -u core.py >> pwl.log 2>&1 &
+~~~
+
