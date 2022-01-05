@@ -29,13 +29,15 @@ RATE = 3
 USERNAME = ''
 PASSWORD = ''
 
-HELP = '输入help获得命令提示列表'
+HELP = '输入#help获得命令提示列表'
 
 
-COMMAND_GUIDE = '''[checked] 查看当前是否签到
-[reward] 领取昨日活跃奖励
-[point] 查看当前个人积分
-[liveness] 查看当前活跃度(⚠️慎用，如果频繁请求此命令(最少间隔30s)，登录状态会被直接注销,需要重启脚本！)
+COMMAND_GUIDE = '''[#checked] 查看当前是否签到
+[#reward] 领取昨日活跃奖励
+[#point] 查看当前个人积分
+[#online-users] 查看当前在线的用户列表
+[#user username] 输入 #user 用户名 可查看此用户详细信息 (#user Gakkiyomi)
+[#liveness] 查看当前活跃度(⚠️慎用，如果频繁请求此命令(最少间隔30s)，登录状态会被直接注销,需要重启脚本！)
 '''
 
 REPEAT_POOL = {} #复读池
@@ -82,9 +84,16 @@ def login(user,password):
         print("登陆失败: " + body['msg'])
         sys.exit(1)
 
+def getOnlineUsers():
+    resp = requests.get(HOST + '/chat-room/online-users',headers={'User-Agent': UA})
+    return json.loads(resp.text)
+
 def getUserInfo(username):
     resp = requests.get(HOST + '/user/'+username+'?apiKey='+API_KEY,headers={'User-Agent': UA})
-    return json.loads(resp.text)
+    if resp.status_code == 200:
+        return json.loads(resp.text)
+    else:
+        print('此用户不存在: '+ username)  
 
 def checkedStatus():
     resp = requests.get(HOST + '/user/checkedIn?apiKey='+API_KEY,headers={'User-Agent': UA})
@@ -101,24 +110,31 @@ def getlivenessInfo():
 def sysIn():
     while True:
       msg = input("")
-      if msg == 'help':
+      if msg == '#help':
         print(COMMAND_GUIDE)
-      elif msg == 'checked':
+      elif msg == '#checked':
           if checkedStatus()['checkedIn']:
                print('今日你已签到！')  
           else:
                print('今日还未签到，摸鱼也要努力呀！')  
-      elif msg == 'reward':
+      elif msg == '#reward':
           if getYesterdayReward()['sum'] == -1:
                print('你已经领取过昨日活跃度奖励了')  
           else:
                print('领取昨日活跃度奖励 积分: ' + str(getYesterdayReward()['sum'])) 
-      elif msg == 'liveness':
+      elif msg == '#liveness':
            print('当前活跃度: '+ str(getlivenessInfo()['liveness']))
-      elif msg == 'point':
-           print('当前积分: '+ str(getUserInfo(USERNAME)['userPoint']))     
-      else:    
-        sendMsg(msg)       
+      elif msg == '#point':
+           print('当前积分: '+ str(getUserInfo(USERNAME)['userPoint']))
+      elif msg == '#online-users':
+           renderOnlineUsers()
+      elif msg.startswith('#user '):
+           user = msg.split( )[1]
+           userInfo = getUserInfo(user)
+           if userInfo is not None:
+                renderUserInfo(userInfo)
+      else: 
+        sendMsg(msg)    
     
     
 def sendMsg(message):
@@ -181,6 +197,26 @@ def analyze(redPacket,red_packet_id,redPacketCreateTime,sender):
         analyzeHeartbeatRedPacket(red_packet_id)
 
 rel.safe_read()
+
+
+def renderUserInfo(userInfo):
+    print("用户ID: "+ userInfo['oId'])
+    print("用户名: "+ userInfo['userName'])
+    print("用户签名: "+ userInfo['userIntro'])
+    print("用户编号: "+ str(userInfo['userNo']))
+    print("所在城市: "+ userInfo['userCity'])
+    print("用户积分: "+ str(userInfo['userPoint']))
+    print("在线时长: "+ str(userInfo['onlineMinute']))
+
+def renderOnlineUsers():
+    res = getOnlineUsers()
+    data = res['data']
+    print('----------------------')
+    print('| 聊天室在线人数: ' + str(data['onlineChatCnt']) + ' |')
+    print('----------------------')
+    for user in data['users']:
+        print('用户: ' + user['userName'])
+        print('----------------------')
 
 def renderRedPacket(redPacket):
     sender = redPacket['userName']
