@@ -12,7 +12,7 @@ import sys
 
 API_KEY = ''
 
-HOST = 'https://pwl.icu'
+HOST = 'https://fishpi.cn'
 
 UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
 
@@ -256,7 +256,7 @@ if __name__ == "__main__":
     _thread.start_new_thread(sysIn,())
     print(HELP)
     websocket.enableTrace(False)
-    ws = websocket.WebSocketApp("wss://pwl.icu/chat-room-channel?apiKey="+API_KEY,
+    ws = websocket.WebSocketApp("wss://fishpi.cn/chat-room-channel?apiKey="+API_KEY,
                               on_open=on_open,
                               on_message=on_message,
                               on_error=on_error,
