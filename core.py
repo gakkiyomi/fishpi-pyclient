@@ -9,6 +9,8 @@ import _thread
 import time
 import configparser
 import sys
+import schedule
+import random
 
 API_KEY = ''
 
@@ -28,6 +30,9 @@ REPEAT_FREQUENCY = 3
 RATE = 3
 USERNAME = ''
 PASSWORD = ''
+SENTENCES = ['你们好！','牵着我的手，闭着眼睛走你也不会迷路。','吃饭了没有?','💗 爱你哟！']
+SOLILOQUIZE_MODE = True
+SOLILOQUIZE_FREQUENCY = 20
 
 HELP = '输入#help获得命令提示列表'
 
@@ -43,7 +48,7 @@ COMMAND_GUIDE = '''[#checked] 查看当前是否签到
 REPEAT_POOL = {} #复读池
 
 def init():
-    global USERNAME,PASSWORD,HEARTBEAT,RED_PACKET_SWITCH,RATE,HEARTBEAT_SMART_MODE,HEARTBEAT_THRESHOLD,HEARTBEAT_TIMEOUT,HEARTBEAT_ADVENTURE,REPEAT_FREQUENCY,REPEAT_MODE
+    global USERNAME,PASSWORD,HEARTBEAT,RED_PACKET_SWITCH,RATE,HEARTBEAT_SMART_MODE,HEARTBEAT_THRESHOLD,HEARTBEAT_TIMEOUT,HEARTBEAT_ADVENTURE,REPEAT_FREQUENCY,REPEAT_MODE,SENTENCES,SOLILOQUIZE_MODE,SOLILOQUIZE_FREQUENCY
     config = configparser.ConfigParser()
     try:
         config.read('./config.ini', encoding='utf-8')
@@ -66,6 +71,11 @@ def init():
             HEARTBEAT_THRESHOLD == 5
         REPEAT_MODE = config.getboolean('chat','repeatMode')
         REPEAT_FREQUENCY = config.getint('chat','repeatFrequency')
+        SOLILOQUIZE_MODE = config.getboolean('chat','soliloquizeMode')
+        SOLILOQUIZE_FREQUENCY = config.getint('chat','soliloquizeFrequency')
+        appendList = json.loads(config.get('chat','sentences'))
+        for i in appendList:
+            SENTENCES.append(i)
     except:
         print("请检查配置文件是否合法")
         sys.exit(1)
@@ -280,8 +290,18 @@ def on_close(ws, close_status_code, close_msg):
 
 def heartbeat(ws):
     while True:
-        time.sleep(180)
+        time.sleep(60)
         ws.send("-hb-")
+        if SOLILOQUIZE_MODE:
+            schedule.run_pending()
+
+def soliloquize():
+    length = len(SENTENCES)
+    index = random.randint(0,length - 1)
+    sendMsg(SENTENCES[index])
+
+if SOLILOQUIZE_MODE:
+    schedule.every(SOLILOQUIZE_FREQUENCY).minutes.do(soliloquize)
 
 def on_open(ws):
     _thread.start_new_thread(heartbeat, (ws,))
