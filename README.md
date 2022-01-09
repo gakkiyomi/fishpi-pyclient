@@ -19,7 +19,7 @@
 
 ## 效果
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-71dba0ea.png)
-![image.png](https://pwl.stackoverflow.wiki/2022/01/image-fac11dcb.png)
+![image.png](https://pwl.stackoverflow.wiki/2022/01/image-f74aae7e.png)
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-1b685256.png)
 
 ## 安装
