@@ -11,6 +11,7 @@ import configparser
 import sys
 import schedule
 import random
+import re
 
 API_KEY = ''
 
@@ -31,6 +32,7 @@ RATE = 3
 USERNAME = ''
 PASSWORD = ''
 SENTENCES = ['你们好！','牵着我的手，闭着眼睛走你也不会迷路。','吃饭了没有?','💗 爱你哟！']
+BLACK_LIST = []
 SOLILOQUIZE_MODE = True
 SOLILOQUIZE_FREQUENCY = 20
 
@@ -42,13 +44,16 @@ COMMAND_GUIDE = '''[#checked] 查看当前是否签到
 [#point] 查看当前个人积分
 [#online-users] 查看当前在线的用户列表
 [#user username] 输入 #user 用户名 可查看此用户详细信息 (#user Gakkiyomi)
+[#blacklist] 查看黑名单列表
+[#ban username] 将某人送入黑名单
+[#unban username] 将某人解除黑名单
 [#liveness] 查看当前活跃度(⚠️慎用，如果频繁请求此命令(最少间隔30s)，登录状态会被直接注销,需要重启脚本！)
 '''
 
 REPEAT_POOL = {} #复读池
 
 def init():
-    global USERNAME,PASSWORD,HEARTBEAT,RED_PACKET_SWITCH,RATE,HEARTBEAT_SMART_MODE,HEARTBEAT_THRESHOLD,HEARTBEAT_TIMEOUT,HEARTBEAT_ADVENTURE,REPEAT_FREQUENCY,REPEAT_MODE,SENTENCES,SOLILOQUIZE_MODE,SOLILOQUIZE_FREQUENCY
+    global USERNAME,PASSWORD,HEARTBEAT,RED_PACKET_SWITCH,RATE,HEARTBEAT_SMART_MODE,HEARTBEAT_THRESHOLD,HEARTBEAT_TIMEOUT,HEARTBEAT_ADVENTURE,REPEAT_FREQUENCY,REPEAT_MODE,SENTENCES,SOLILOQUIZE_MODE,SOLILOQUIZE_FREQUENCY,BLACK_LIST
     config = configparser.ConfigParser()
     try:
         config.read('./config.ini', encoding='utf-8')
@@ -76,6 +81,11 @@ def init():
         appendList = json.loads(config.get('chat','sentences'))
         for i in appendList:
             SENTENCES.append(i)
+        blacklist = json.loads(config.get('chat','blacklist'))
+        for i in blacklist:
+            BLACK_LIST.append(i)
+        if BLACK_LIST.__contains__(''): 
+            BLACK_LIST.remove('')
     except:
         print("请检查配置文件是否合法")
         sys.exit(1)
@@ -143,7 +153,15 @@ def sysIn():
            userInfo = getUserInfo(user)
            if userInfo is not None:
                 renderUserInfo(userInfo)
-      else: 
+      elif msg == '#blacklist':  
+          print(BLACK_LIST)
+      elif msg.startswith('#ban '):
+          user = msg.split( )[1]
+          banSomeone(user)
+      elif msg.startswith('#unban '):
+          user = msg.split( )[1]
+          unbanSomeone(user)                
+      else:
         sendMsg(msg)    
     
     
@@ -253,8 +271,50 @@ def repeat(msg):
         sendMsg(msg)
         REPEAT_POOL[msg] = REPEAT_POOL[msg] + 1 
     else:
-        REPEAT_POOL[msg] = REPEAT_POOL[msg] + 1 
-            
+        REPEAT_POOL[msg] = REPEAT_POOL[msg] + 1
+
+def unbanSomeone(userName):
+    if BLACK_LIST.__contains__(userName) == False:
+        print(userName + '不在黑名单中')
+        return
+    userInfo = getUserInfo(userName)
+    if userInfo is None:
+        return
+    BLACK_LIST.remove(userName)
+    #持久化到文件
+    f_path = './config.ini'
+    src = open(f_path, "r+")
+    configText = src.read()
+    src.close()
+    dst = open('./config.ini', 'w')
+    after = ''
+    if len(BLACK_LIST) ==0 :
+        after = r'blacklist=[""]'
+    else:
+        after = "blacklist="+ str(BLACK_LIST).replace("\'","\"")
+    dst.write(re.sub(r'blacklist.*', after,configText))
+    dst.close()
+    print(userName + '已从小黑屋中释放')        
+
+def banSomeone(userName):
+    if BLACK_LIST.__contains__(userName):
+        print(userName + ' 已在黑名单中')
+        return
+    userInfo = getUserInfo(userName)
+    if userInfo is None:
+        return   
+    BLACK_LIST.append(userName)
+    #持久化到文件
+    f_path = './config.ini'
+    src = open(f_path, "r+")
+    configText = src.read()
+    src.close()
+    dst = open('./config.ini', 'w')
+    after = "blacklist="+ str(BLACK_LIST).replace("\'","\"")
+    dst.write(re.sub(r'blacklist.*', after,configText))
+    dst.close()
+    print(userName + '已加入到黑名单中')
+
 def renderMsg(message):
     if message['type'] == 'msg':
         if message['content'].find("redPacket") != -1:
@@ -266,6 +326,8 @@ def renderMsg(message):
         else:
             time = message['time']
             user = message['userName']
+            if len(BLACK_LIST) > 0 and BLACK_LIST.__contains__(user):
+                return
             if user == USERNAME:
                 print('\t\t\t\t\t\t[' + time +']')
                 print('\t\t\t\t\t\t你说: ' + message['md'])
@@ -311,6 +373,7 @@ if __name__ == "__main__":
     login(USERNAME,PASSWORD)
     _thread.start_new_thread(sysIn,())
     print(HELP)
+    print('小黑屋成员: ' + str(BLACK_LIST))
     websocket.enableTrace(False)
     ws = websocket.WebSocketApp("wss://fishpi.cn/chat-room-channel?apiKey="+API_KEY,
                               on_open=on_open,
