@@ -24,6 +24,7 @@
     * 自定义抢红包延时
     * 心跳红包防止踩坑
     * 心跳红包风险预测
+    * 猜拳红包百分百胜率
 
 ## 效果
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-71dba0ea.png)

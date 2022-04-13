@@ -169,8 +169,11 @@ def sendMsg(message):
     params = {'apiKey': API_KEY,'content':message}
     requests.post(HOST + "/chat-room/send",json=params,headers={'User-Agent': UA})
 
-def openRedPacket(red_packet_id):
-    params = {'apiKey': API_KEY,'oId':red_packet_id}
+
+def openRedPacket(red_packet_id,body):
+    params = {'apiKey': API_KEY,'oId':red_packet_id} 
+    if body:
+       params.update(body)
     resp = requests.post(HOST + "/chat-room/red-packet/open",json=params,headers={'User-Agent': UA})
     who = json.loads(resp.text)['who']
     for i in who:
@@ -189,6 +192,15 @@ def more():
     resp = requests.get(HOST + "/chat-room/more?page=1",headers={'User-Agent': UA})
     return json.loads(resp.text)
 
+
+def analyzeRockPaperScissorsRedPacket(red_packet_id):
+    for data in more()['data']:
+        if data['oId'] == red_packet_id:
+           res = analyze(json.loads(data['content']),red_packet_id,data['time'],data['userName'])
+           openRedPacket(red_packet_id,{'gesture': str(res)})
+           return
+    print("红包助手: 你与此红包无缘")
+
 def analyzeHeartbeatRedPacket(red_packet_id):
     for data in more()['data']:
         if data['oId'] == red_packet_id:
@@ -199,6 +211,15 @@ def analyzeHeartbeatRedPacket(red_packet_id):
 def analyze(redPacket,red_packet_id,redPacketCreateTime,sender):
     count = redPacket['count']
     got = redPacket['got']
+    redPacketType = redPacket['type']
+    if redPacketType == 'rockPaperScissors':
+       gesture = redPacket['gesture']
+       if gesture == 0:
+           return 2
+       elif gesture == 1:
+           return 0
+       else:
+           return 1
     if redPacket['count'] == redPacket['got']:
         print('红包助手: '+sender+' 发送的心跳红包, 遗憾没有抢到，比别人慢了一点点，建议换宽带!')
         return
@@ -210,7 +231,7 @@ def analyze(redPacket,red_packet_id,redPacketCreateTime,sender):
            return   
     print('红包助手: 此心跳红包的中奖概率为:'+str(probability))    
     if probability >= HEARTBEAT_THRESHOLD:
-        openRedPacket(red_packet_id)
+        openRedPacket(red_packet_id,{})
     #还未结束，递归操作
     else:
         timeArray = time.strptime(redPacketCreateTime, "%Y-%m-%d %H:%M:%S")
@@ -255,13 +276,16 @@ def renderRedPacket(redPacket):
                 print('红包助手: ' + sender +' 发了一个心跳红包') 
                 analyzeHeartbeatRedPacket(redPacket['oId'])
                 return
-            openRedPacket(redPacket['oId'])
+            openRedPacket(redPacket['oId'],{})
         else:
             print('红包助手: '+sender+' 发送了一个心跳红包, 你跳过了这个心跳红包！不尝试赌一下人品吗？')
+    if content['type'] == 'rockPaperScissors':
+       print('红包助手: '+sender+' 发送了一个猜拳红包, 红包助手正在帮你猜拳，石头剪刀布！')
+       analyzeRockPaperScissorsRedPacket(redPacket['oId'])
     else:
         print('红包助手: '+sender+' 发送了一个红包, 但社区规定，助手抢红包要等'+str(RATE)+'秒哦～')
         time.sleep(RATE)
-        openRedPacket(redPacket['oId'])
+        openRedPacket(redPacket['oId'],{})
 
 def repeat(msg):
     if REPEAT_POOL.__contains__(msg) == False:
