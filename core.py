@@ -167,7 +167,11 @@ def sysIn():
     
 def sendMsg(message):
     params = {'apiKey': API_KEY,'content':message}
-    requests.post(HOST + "/chat-room/send",json=params,headers={'User-Agent': UA})
+    ret = requests.post(HOST + "/chat-room/send",json=params,headers={'User-Agent': UA})
+    ret_json = json.loads(ret.text)
+    if ('code' in ret_json and ret_json['code'] == -1):
+        print(ret_json['msg'])
+         
 
 
 def openRedPacket(red_packet_id,body):
@@ -175,7 +179,11 @@ def openRedPacket(red_packet_id,body):
     if body:
        params.update(body)
     resp = requests.post(HOST + "/chat-room/red-packet/open",json=params,headers={'User-Agent': UA})
-    who = json.loads(resp.text)['who']
+    resp_json = json.loads(resp.text)
+    if ('code' in resp_json and resp_json['code'] == -1):
+       print(resp_json['msg'])
+       return
+    who = resp_json['who']
     for i in who:
         if i['userName'] == USERNAME:
             if i['userMoney'] < 0:
@@ -239,7 +247,7 @@ def analyze(redPacket,red_packet_id,redPacketCreateTime,sender):
         if int(time.time()) - timeStamp > HEARTBEAT_TIMEOUT: # 递归将在1秒钟后结束
             if HEARTBEAT_ADVENTURE:
                 print("红包助手: 超时了，干了兄弟们！")
-                openRedPacket(red_packet_id)
+                openRedPacket(red_packet_id,{})
             else:
                 print("红包助手: 忍住了，他们血亏，我看戏！")    
             return
