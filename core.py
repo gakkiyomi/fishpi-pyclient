@@ -90,9 +90,9 @@ def init():
         print("请检查配置文件是否合法")
         sys.exit(1)
 
-def login(user,password):
+def login(user,password,code):
     global API_KEY
-    params = {'nameOrEmail': user,'userPassword':hashlib.md5(str(password).encode('utf-8')).hexdigest()}
+    params = {'nameOrEmail': user,'userPassword':hashlib.md5(str(password).encode('utf-8')).hexdigest(),'mfaCode':code}
     resp = requests.post(HOST + "/api/getKey",json=params,headers={'User-Agent': UA})
     body = json.loads(resp.text)
 
@@ -100,6 +100,10 @@ def login(user,password):
         print("登陆成功 欢迎" + USERNAME + '进入聊天室!')
         print("更多功能与趣味游戏请访问网页端: " + HOST)
         API_KEY = body['Key']
+        return True
+    elif body['code'] == -1 and body['msg'] == '两步验证失败，请填写正确的一次性密码':
+        print("请输入两步验证码:")
+        return False
     else:
         print("登陆失败: " + body['msg'])
         sys.exit(1)
@@ -131,7 +135,9 @@ def sysIn():
     while True:
       msg = input("")
       if msg == '#help':
-        print(COMMAND_GUIDE)
+          print(COMMAND_GUIDE)
+      elif len(API_KEY) == 0:
+          login(USERNAME,PASSWORD,msg) 
       elif msg == '#checked':
           if checkedStatus()['checkedIn']:
                print('今日你已签到！')  
@@ -402,10 +408,11 @@ def on_open(ws):
 
 if __name__ == "__main__":
     init()
-    login(USERNAME,PASSWORD)
+    success = login(USERNAME,PASSWORD,'')
     _thread.start_new_thread(sysIn,())
-    print(HELP)
-    print('小黑屋成员: ' + str(BLACK_LIST))
+    if success:
+        print(HELP)
+        print('小黑屋成员: ' + str(BLACK_LIST))          
     websocket.enableTrace(False)
     ws = websocket.WebSocketApp("wss://fishpi.cn/chat-room-channel?apiKey="+API_KEY,
                               on_open=on_open,
