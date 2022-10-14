@@ -412,7 +412,13 @@ if __name__ == "__main__":
     _thread.start_new_thread(sysIn,())
     if success:
         print(HELP)
-        print('小黑屋成员: ' + str(BLACK_LIST))          
+        print('小黑屋成员: ' + str(BLACK_LIST))
+    else:
+        while len(API_KEY) == 0:
+            time.sleep(3)
+            if len(API_KEY) > 0:
+                break
+    print("进入聊天室")        
     websocket.enableTrace(False)
     ws = websocket.WebSocketApp("wss://fishpi.cn/chat-room-channel?apiKey="+API_KEY,
                               on_open=on_open,
