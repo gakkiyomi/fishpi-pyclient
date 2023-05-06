@@ -248,9 +248,7 @@ def more():
 def analyzeRockPaperScissorsRedPacket(red_packet_id):
     for data in more()['data']:
         if data['oId'] == red_packet_id:
-            res = analyze(json.loads(
-                data['content']), red_packet_id, data['time'], data['userName'])
-            openRedPacket(red_packet_id, {'gesture': str(res)})
+            openRedPacket(red_packet_id, {'gesture': str(random.choice([0,1,2]))})
             return
     print("红包助手: 你与此红包无缘")
 
@@ -267,15 +265,6 @@ def analyzeHeartbeatRedPacket(red_packet_id):
 def analyze(redPacket, red_packet_id, redPacketCreateTime, sender):
     count = redPacket['count']
     got = redPacket['got']
-    redPacketType = redPacket['type']
-    if redPacketType == 'rockPaperScissors':
-        gesture = redPacket['gesture']
-        if gesture == 0:
-            return 2
-        elif gesture == 1:
-            return 0
-        else:
-            return 1
     if redPacket['count'] == redPacket['got']:
         print('红包助手: '+sender+' 发送的心跳红包, 遗憾没有抢到，比别人慢了一点点，建议换宽带!')
         return
@@ -337,7 +326,7 @@ def renderRedPacket(redPacket):
                 return
             openRedPacket(redPacket['oId'], {})
         else:
-            print('红包助手: '+sender+' 发送了一个心跳红包, 你跳过了这个心跳红包！不尝试赌一下人品吗？')
+            print('红包助手: '+sender+' 发送了一个心跳红包, 你选择跳过了这个心跳红包！不尝试赌一下人品吗？')
     if content['type'] == 'rockPaperScissors':
         print('红包助手: '+sender+' 发送了一个猜拳红包, 红包助手正在帮你猜拳，石头剪刀布！')
         analyzeRockPaperScissorsRedPacket(redPacket['oId'])
