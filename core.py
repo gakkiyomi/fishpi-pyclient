@@ -12,10 +12,13 @@ import sys
 import schedule
 import random
 import re
+from dotenv import dotenv_values
 
 API_KEY = ''
 
 HOST = 'https://fishpi.cn'
+
+VERSION = ''
 
 UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
 
@@ -54,12 +57,11 @@ REPEAT_POOL = {}  # 复读池
 
 
 def init():
-    global USERNAME, PASSWORD, HEARTBEAT, RED_PACKET_SWITCH, RATE, HEARTBEAT_SMART_MODE, HEARTBEAT_THRESHOLD, HEARTBEAT_TIMEOUT, HEARTBEAT_ADVENTURE, REPEAT_FREQUENCY, REPEAT_MODE, SENTENCES, SOLILOQUIZE_MODE, SOLILOQUIZE_FREQUENCY, BLACK_LIST
+    global HEARTBEAT, RED_PACKET_SWITCH, RATE, HEARTBEAT_SMART_MODE, HEARTBEAT_THRESHOLD, HEARTBEAT_TIMEOUT, HEARTBEAT_ADVENTURE, REPEAT_FREQUENCY, REPEAT_MODE, SENTENCES, SOLILOQUIZE_MODE, SOLILOQUIZE_FREQUENCY, BLACK_LIST
     config = configparser.ConfigParser()
     try:
         config.read('./config.ini', encoding='utf-8')
-        USERNAME = config.get('auth', 'username')
-        PASSWORD = config.get('auth', 'password')
+        initUserInfo(config)
         RATE = RATE if config.getint(
             'redPacket', 'rate') < RATE else config.getint('redPacket', 'rate')
         RED_PACKET_SWITCH = config.getboolean('redPacket', 'openRedPacket')
@@ -91,9 +93,22 @@ def init():
             BLACK_LIST.append(i)
         if BLACK_LIST.__contains__(''):
             BLACK_LIST.remove('')
+        initVersion()
     except:
         print("请检查配置文件是否合法")
         sys.exit(1)
+
+
+def initUserInfo(config):
+    global USERNAME, PASSWORD
+    USERNAME = config.get('auth', 'username')
+    PASSWORD = config.get('auth', 'password')
+
+
+def initVersion():
+    global VERSION
+    env = dotenv_values(".env")
+    VERSION = env.get('version')
 
 
 def login(user, password, code):
@@ -191,7 +206,8 @@ def sysIn():
 
 
 def sendMsg(message):
-    params = {'apiKey': API_KEY, 'content': message, 'client': 'Python/v1'}
+    params = {'apiKey': API_KEY, 'content': message,
+              'client': f'Python/{VERSION}'}
     ret = requests.post(HOST + "/chat-room/send",
                         json=params, headers={'User-Agent': UA})
     ret_json = json.loads(ret.text)
