@@ -29,7 +29,7 @@ def render_online_users(api: FishPi):
 
 def login(api: FishPi):
     success = api.login(GLOBAL_CONFIG.auth_config.username,
-                        GLOBAL_CONFIG.auth_config.password, '')
+                        GLOBAL_CONFIG.auth_config.password, GLOBAL_CONFIG.auth_config.mfa_code)
     if success:
         print(HELP)
         if len(GLOBAL_CONFIG.repeat_config.blacklist) > 0:

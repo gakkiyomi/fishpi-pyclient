@@ -11,9 +11,14 @@ class RedPacketConfig(object):
 
 
 class AuthConfig(object):
-    def __init__(self, username='', password=''):
+    def __init__(self, username='', password='', mfa_code=''):
         self.username = username
         self.password = password
+        self.mfa_code = mfa_code
+
+    @classmethod
+    def build(cls, map: dict):
+        return cls(map['username'], map['password'], map['2fa_code'])
 
 
 class RepeatConfig(object):
