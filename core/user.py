@@ -1,6 +1,9 @@
 
 
+import time
 from api import FishPi
+from utils.utils import *
+from core.config import GLOBAL_CONFIG
 
 
 def render_user_info(userInfo):
@@ -22,3 +25,17 @@ def render_online_users(api: FishPi):
     for user in data['users']:
         print('用户: ' + user['userName'])
         print('----------------------')
+
+
+def login(api: FishPi):
+    success = api.login(GLOBAL_CONFIG.auth_config.username,
+                        GLOBAL_CONFIG.auth_config.password, '')
+    if success:
+        print(HELP)
+        if len(GLOBAL_CONFIG.repeat_config.blacklist) > 0:
+            print('小黑屋成员: ' + str(GLOBAL_CONFIG.repeat_config.blacklist))
+    else:
+        while len(api.api_key) == 0:
+            time.sleep(3)
+            if len(api.api_key) > 0:
+                break

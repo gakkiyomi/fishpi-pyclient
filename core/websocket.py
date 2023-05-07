@@ -40,6 +40,7 @@ def start(api: FishPi):
     global __api
     __api = api
 
+    rel.safe_read()
     websocket.enableTrace(False)
     ws = websocket.WebSocketApp("wss://fishpi.cn/chat-room-channel?apiKey=" + api.api_key,
                                 on_open=on_open,
@@ -47,3 +48,6 @@ def start(api: FishPi):
                                 on_error=on_error,
                                 on_close=on_close)
     ws.run_forever(dispatcher=rel, sslopt={"cert_reqs": ssl.CERT_NONE})
+    print("进入聊天室")
+    rel.signal(2, rel.abort)
+    rel.dispatch()
