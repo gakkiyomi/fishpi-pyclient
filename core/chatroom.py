@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 import random
 import schedule
 from api import FishPi

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from api.chatroom import ChatRoom
 from utils.utils import UA, HOST
 from .__api__ import Base
