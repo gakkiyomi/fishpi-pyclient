@@ -1,11 +1,9 @@
-from api import FishPi
+import _thread
 from core.blacklist import *
 from core.config import GLOBAL_CONFIG
 from core.user import *
 
-
 HELP = '输入#help获得命令提示列表'
-
 
 COMMAND_GUIDE = '''[#checked] 查看当前是否签到
 [#reward] 领取昨日活跃奖励
@@ -19,9 +17,11 @@ COMMAND_GUIDE = '''[#checked] 查看当前是否签到
 '''
 
 
+def init_sys_in(api: FishPi):
+    _thread.start_new_thread(console_input, (api,))
 
 
-def consle_input(api:FishPi):
+def console_input(api: FishPi):
     while True:
         msg = input("")
         if msg == '#help':
@@ -54,7 +54,7 @@ def consle_input(api:FishPi):
             if userInfo is not None:
                 render_user_info(userInfo)
         elif msg == '#blacklist':
-            print(GLOBAL_CONFIG.repead_config.blacklist)
+            print(GLOBAL_CONFIG.repeat_config.blacklist)
         elif msg.startswith('#ban '):
             user = msg.split()[1]
             ban_someone(api, user)

@@ -2,7 +2,7 @@
 import requests
 import json
 
-from core.const import UA, HOST
+from utils.utils import UA, HOST
 from .__api__ import Base
 
 
@@ -27,7 +27,6 @@ class User(Base):
         resp = requests.get(HOST + '/user/checkedIn?apiKey=' +
                             self.api_key, headers={'User-Agent': UA})
         return json.loads(resp.text)
-
 
     def get_liveness_info(self) -> dict:
         resp = requests.get(HOST + '/user/liveness?apiKey=' +

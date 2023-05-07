@@ -1,21 +1,27 @@
 import json
+
+from api import FishPi
+from core.chatroom import init_soliloquize
+from core.cli import init_sys_in
 from core.config import GLOBAL_CONFIG, RedPacketConfig, AuthConfig, RepeatConfig
 import configparser
 import os
 import sys
 
 
-def __init__():
+def __init__(api: FishPi):
     config = configparser.ConfigParser()
     try:
         print("配置读取中")
         config.read(f'{os.getcwd()}/config.ini', encoding='utf-8')
         GLOBAL_CONFIG.auth_config = __init_login_auth_config(config)
         GLOBAL_CONFIG.redpacket_config = __int_redpacket_var(config)
-        GLOBAL_CONFIG.repead_config = __init_repeat_config(config)
+        GLOBAL_CONFIG.repeat_config = __init_repeat_config(config)
     except:
         print("请检查config.ini配置文件是否合法")
         sys.exit(1)
+    init_soliloquize(api)
+    init_sys_in(api)
 
 
 def __int_redpacket_var(config) -> RedPacketConfig:

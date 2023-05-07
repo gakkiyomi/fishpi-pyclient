@@ -59,7 +59,7 @@ def rush_redpacket(api: FishPi, redpacket):
     else:
         print('红包助手: '+sender+' 发送了一个红包, 但社区规定，助手抢红包要等' +
               str(GLOBAL_CONFIG.redpacket_config.rate)+'秒哦～')
-        # time.sleep(RATE)
+        time.sleep(GLOBAL_CONFIG.redpacket_config.rate)
         open_red_packet(api, redpacket['oId'])
 
 

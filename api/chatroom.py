@@ -1,8 +1,8 @@
 import requests
 import json
 import random
-from core.const import UA, HOST
-from core.version import __version__
+from utils.utils import UA, HOST
+from utils.version import __version__
 from .__api__ import Base
 
 

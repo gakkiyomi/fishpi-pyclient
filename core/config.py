@@ -1,7 +1,6 @@
-
-
 class RedPacketConfig(object):
-    def __init__(self, red_packet_switch=True, heartbeat=False, smart_mode=False, threshold=0.5, adventure_mode=False, timeout=5, rate=3):
+    def __init__(self, red_packet_switch=True, heartbeat=False, smart_mode=False, threshold=0.5, adventure_mode=False,
+                 timeout=5, rate=3):
         self.red_packet_switch = red_packet_switch
         self.heartbeat = heartbeat
         self.smart_mode = smart_mode
@@ -18,7 +17,8 @@ class AuthConfig(object):
 
 
 class RepeatConfig(object):
-    def __init__(self, blacklist=[], repeat_mode_switch=False, frequency=5, soliloquize_switch=False, soliloquize_frequency=20, sentences=[]):
+    def __init__(self, blacklist=[], repeat_mode_switch=False, frequency=5, soliloquize_switch=False,
+                 soliloquize_frequency=20, sentences=[]):
         self.repeat_mode_switch = repeat_mode_switch
         self.frequency = frequency
         self.soliloquize_switch = soliloquize_switch
@@ -29,10 +29,10 @@ class RepeatConfig(object):
 
 
 class Config(object):
-    def __init__(self, auth: AuthConfig = {}, redpacket: RedPacketConfig = {}, repead: RepeatConfig = {}):
+    def __init__(self, auth: AuthConfig = None, redpacket: RedPacketConfig = None, repeat: RepeatConfig = None):
         self.auth_config = auth
         self.redpacket_config = redpacket
-        self.repead_config = repead
+        self.repeat_config = repeat
 
 
 GLOBAL_CONFIG = Config()

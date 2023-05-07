@@ -1,23 +1,11 @@
 from api.chatroom import ChatRoom
-from core.const import UA, HOST
-from dotenv import dotenv_values
+from utils.utils import UA, HOST
 from .__api__ import Base
 from .user import User
 import sys
 import requests
 import hashlib
 import json
-
-
-def __init__():
-    env = dotenv_values(".env")
-    init_host(env)
-
-
-def init_host(config: dict):
-    global HOST
-    if 'fishpi_domain' in config:
-        HOST = config.get('fishpi_domain')
 
 
 class FishPi(Base):
@@ -59,5 +47,14 @@ class FishPi(Base):
 
     def get_yesterday_reward(self) -> dict:
         resp = requests.get(
-            HOST + '/activity/yesterday-liveness-reward-api?apiKey='+self.api_key, headers={'User-Agent': UA})
+            HOST + '/activity/yesterday-liveness-reward-api?apiKey=' + self.api_key, headers={'User-Agent': UA})
         return json.loads(resp.text)
+
+
+def from_instance(source: FishPi) -> FishPi:
+    newly = FishPi()
+    newly.user = source.user
+    newly.chatroom = source.chatroom
+    newly.api_key = source.api_key
+    newly.current_user = source.current_user
+    return newly
