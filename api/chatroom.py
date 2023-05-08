@@ -43,6 +43,7 @@ class ChatRoom(Base):
             'oId': red_packet_id,
             'gesture': gesture
         }
+        print(gesture)
         resp = requests.post(HOST + "/chat-room/red-packet/open",
                              json=params, headers={'User-Agent': UA})
         return json.loads(resp.text)
