@@ -47,7 +47,7 @@ def rush_redpacket(api: FishPi, redpacket):
         if GLOBAL_CONFIG.redpacket_config.heartbeat:
             if GLOBAL_CONFIG.redpacket_config.smart_mode:
                 print('红包助手: ' + sender + ' 发了一个心跳红包')
-                __analyzeHeartbeatRedPacket(redpacket['oId'])
+                __analyzeHeartbeatRedPacket(api, redpacket['oId'])
                 return
             open_red_packet(api, redpacket['oId'])
         else:
