@@ -35,11 +35,13 @@ class ChatRoom(Base):
                              json=params, headers={'User-Agent': UA})
         return json.loads(resp.text)
 
-    def open_rock_paper_scissors_redpacket(self, red_packet_id, gesture: int = str(random.choice([0, 1, 2]))) -> dict:
+    def open_rock_paper_scissors_redpacket(self, red_packet_id, gesture: int = -1) -> dict:
+        if gesture not in [0, 1, 2]:
+            gesture = random.choice([0, 1, 2])
         params = {
             'apiKey': self.api_key,
             'oId': red_packet_id,
-            'gesture':gesture
+            'gesture': gesture
         }
         resp = requests.post(HOST + "/chat-room/red-packet/open",
                              json=params, headers={'User-Agent': UA})
