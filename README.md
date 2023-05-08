@@ -54,11 +54,11 @@ pip install -r requirements.txt
 执行
 
 ~~~bash
-python main.py
+python main/main.py
 ~~~
 
 后台执行
 
 ~~~bash
-nohup python -u main.py >> pwl.log 2>&1 &
+nohup python -u main/main.py >> pwl.log 2>&1 &
 ~~~
