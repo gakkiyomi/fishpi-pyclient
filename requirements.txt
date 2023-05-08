@@ -2,3 +2,4 @@ rel==0.4.7
 requests==2.22.0
 websocket_client==1.2.3
 schedule==1.2.0
+click==8.1.3
