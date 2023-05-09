@@ -1,27 +1,38 @@
 import json
 
-from api import FishPi
-from core.chatroom import init_soliloquize
-from core.cli import init_sys_in
-from core.config import GLOBAL_CONFIG, RedPacketConfig, AuthConfig, RepeatConfig
+from src.api import FishPi
+from .chatroom import init_soliloquize
+from .cli import init_sys_in
+from .config import GLOBAL_CONFIG, RedPacketConfig, AuthConfig, RepeatConfig
 import configparser
 import os
-import sys
 
 
 def __init__(api: FishPi):
+    file_path = f'{os.getcwd()}/config.ini'
     config = configparser.ConfigParser()
     try:
         print("配置读取中")
-        config.read(f'{os.getcwd()}/config.ini', encoding='utf-8')
-        GLOBAL_CONFIG.auth_config = __init_login_auth_config(config)
-        GLOBAL_CONFIG.redpacket_config = __int_redpacket_var(config)
-        GLOBAL_CONFIG.repeat_config = __init_repeat_config(config)
+        if not os.path.exists(file_path):
+            print("config.ini配置文件不存在")
+            __init_default_config()
+        else:
+            config.read(file_path, encoding='utf-8')
+            GLOBAL_CONFIG.auth_config = __init_login_auth_config(config)
+            GLOBAL_CONFIG.redpacket_config = __int_redpacket_var(config)
+            GLOBAL_CONFIG.repeat_config = __init_repeat_config(config)
     except:
-        print("请检查config.ini配置文件是否合法")
-        sys.exit(1)
+        print("config.ini配置文件不合法")
+        __init_default_config()
     init_soliloquize(api)
     init_sys_in(api)
+
+
+def __init_default_config():
+    print("加载默认配置文件")
+    GLOBAL_CONFIG.auth_config = AuthConfig()
+    GLOBAL_CONFIG.redpacket_config = RedPacketConfig()
+    GLOBAL_CONFIG.repeat_config = RepeatConfig()
 
 
 def __int_redpacket_var(config) -> RedPacketConfig:

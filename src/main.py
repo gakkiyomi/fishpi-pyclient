@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 import click
-from api import FishPi
-from core import __init__
-from core.config import GLOBAL_CONFIG, AuthConfig
-from core.user import login
-from core.websocket import start
-from utils.version import __version__
+from src.core import __init__
+from src.core.config import GLOBAL_CONFIG, AuthConfig
+from src.core.user import login
+from src.core.websocket import start
+from src.utils.version import __version__
+from src.api import FishPi
 
 
 def run(params: dict):

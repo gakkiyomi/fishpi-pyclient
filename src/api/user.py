@@ -2,7 +2,7 @@
 import requests
 import json
 
-from utils.utils import UA, HOST
+from src.utils.utils import UA, HOST
 from .__api__ import Base
 
 
