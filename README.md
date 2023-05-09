@@ -46,5 +46,5 @@ pip install pwl-chat-python
 ## 运行
 
 ```bash
-pwl-chat-python -u username -p password -c 两部验证码
+pwl-chat-python -u username -p password -c 两步验证码
 ```
