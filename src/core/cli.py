@@ -1,8 +1,8 @@
 import _thread
-from core.blacklist import *
-from core.config import GLOBAL_CONFIG
-from core.user import *
-from utils.utils import *
+from .blacklist import *
+from .config import GLOBAL_CONFIG
+from .user import *
+from src.utils.utils import *
 
 
 

@@ -10,7 +10,7 @@ import io
 import os
 import sys
 from shutil import rmtree
-from utils.version import __version__
+from src.utils.version import __version__
 
 from setuptools import setup, Command
 
@@ -96,7 +96,7 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=['api', 'core', 'utils', 'main'],
+    packages=['src', 'src/api', 'src/core', 'src/utils'],
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
 
@@ -122,7 +122,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'pwl-chat-python = main.main:cli',
+            'pwl-chat-python = src.main:cli',
         ],
     }
 

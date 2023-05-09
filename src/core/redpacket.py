@@ -1,8 +1,8 @@
-from api import FishPi
+from src.api import FishPi
 import json
 import time
 
-from core.config import GLOBAL_CONFIG
+from .config import GLOBAL_CONFIG
 
 
 def __open_redpacket_render(username, redpacket: dict) -> None:

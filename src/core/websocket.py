@@ -6,9 +6,9 @@ import schedule
 import websocket
 import _thread
 
-from api import FishPi
-from core.chatroom import listener
-from core.config import GLOBAL_CONFIG
+from src.api import FishPi
+from .chatroom import listener
+from .config import GLOBAL_CONFIG
 
 __api = FishPi()
 def on_message(ws, message):

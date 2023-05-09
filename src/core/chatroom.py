@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import random
 import schedule
-from api import FishPi
-from core.config import GLOBAL_CONFIG
-from core.redpacket import rush_redpacket
+from src.api import FishPi
+from .config import GLOBAL_CONFIG
+from .redpacket import rush_redpacket
 
 
 REPEAT_POOL = {}  # 复读池

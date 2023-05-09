@@ -1,9 +1,9 @@
 
 
 import time
-from api import FishPi
-from utils.utils import *
-from core.config import GLOBAL_CONFIG
+from src.api import FishPi
+from src.utils.utils import *
+from .config import GLOBAL_CONFIG
 
 
 def render_user_info(userInfo):

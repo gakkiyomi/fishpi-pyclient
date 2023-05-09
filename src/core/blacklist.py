@@ -1,8 +1,8 @@
 
 import os
 import re
-from api import FishPi
-from core.config import GLOBAL_CONFIG
+from src.api import FishPi
+from .config import GLOBAL_CONFIG
 
 
 def unban_someone(api: FishPi, username):
