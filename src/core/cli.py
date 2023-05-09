@@ -37,7 +37,7 @@ def console_input(api: FishPi):
             print(
                 '当前积分: ' + str(api.user.get_user_info(GLOBAL_CONFIG.auth_config.username)['userPoint']))
         elif msg == '#online-users':
-            render_online_users()
+            render_online_users(api)
         elif msg.startswith('#user '):
             user = msg.split()[1]
             userInfo = api.user.get_user_info(user)
