@@ -4,6 +4,24 @@
 
 基于摸鱼打工人社区——摸鱼派开放 API 开发的摸鱼派聊天室 python 客户端程序，可以在里面边写 Bug 边愉快地吹水摸鱼。
 
+## 安装
+
+环境: Python3.10 以上
+
+执行
+
+```bash
+pip install pwl-chat-python
+```
+
+## 运行
+
+```bash
+pwl-chat-python -u username -p password -c <两步验证码>
+```
+
+## 功能
+
 - 💬 基本聊天吹水；
 - ⬆️ 社区快捷命令
   - 领取昨日活跃度奖励
@@ -32,19 +50,3 @@
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-71dba0ea.png)
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-f74aae7e.png)
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-1b685256.png)
-
-## 安装
-
-环境: Python3.10 以上
-
-执行
-
-```bash
-pip install pwl-chat-python
-```
-
-## 运行
-
-```bash
-pwl-chat-python -u username -p password -c 两步验证码
-```

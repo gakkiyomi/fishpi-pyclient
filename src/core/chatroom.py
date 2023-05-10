@@ -46,7 +46,10 @@ def listener(api: FishPi, message):
                 print('\t\t\t\t\t\t[' + time + ']')
                 print('\t\t\t\t\t\t你说: ' + message['md'])
             else:
-                print('[' + time + ']')
+                if 'client' in message:
+                    print('[' + time + '] 来自(' + message['client']+')')
+                else:
+                    print('[' + time + ']')
                 print(user + '说:')
                 print(message['md'])
                 print('\r\n')
