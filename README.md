@@ -20,6 +20,14 @@ pip install pwl-chat-python
 pwl-chat-python -u username -p password -c <两步验证码>
 ```
 
+## 调试
+
+如果你已安装,请先卸载，否则启动调试会执行安装好的包
+
+```bash
+python core.py
+```
+
 ## 功能
 
 - 💬 基本聊天吹水；
