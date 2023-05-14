@@ -1,6 +1,6 @@
 class RedPacketConfig(object):
     def __init__(self, red_packet_switch=True, heartbeat=True, smart_mode=True, threshold=0.5, adventure_mode=True,
-                 timeout=7, rate=3):
+                 timeout=7, rate=3, rps_limit=100):
         self.red_packet_switch = red_packet_switch
         self.heartbeat = heartbeat
         self.smart_mode = smart_mode
@@ -8,6 +8,7 @@ class RedPacketConfig(object):
         self.adventure_mode = adventure_mode
         self.timeout = timeout
         self.rate = rate
+        self.rps_limit = rps_limit
 
 
 class AuthConfig(object):

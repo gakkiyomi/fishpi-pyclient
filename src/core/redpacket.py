@@ -1,23 +1,28 @@
 from src.api import FishPi
 import json
 import time
-
+import enum
+from src.utils import utils
 from .config import GLOBAL_CONFIG
 
+CODE = enum.Enum('REDPACKET_CODE', ['SUCCESS', 'LOSED', 'NOT_ME', "ZERO"])
 
-def __open_redpacket_render(username, redpacket: dict) -> None:
+
+def __open_redpacket_render(username, redpacket: dict) -> CODE:
     who = redpacket['who']
     for i in who:
         if i['userName'] == username:
             if i['userMoney'] < 0:
                 print("红包助手: 悲剧，你竟然被反向抢了红包(" + str(i['userMoney']) + ")!")
+                return CODE.LOSED
             elif i['userMoney'] == 0:
                 print("红包助手: 零溢事件，抢到了一个空的红包(" + str(i['userMoney']) + ")!")
+                return CODE.ZERO
             else:
                 print("红包助手: 恭喜，你抢到了一个红包(" + str(i['userMoney']) + ")!")
-            return i['userMoney']
+                return CODE.SUCCESS
     print("红包助手: 遗憾，比别人慢了一点点，建议换宽带!")
-    return 0
+    return CODE.NOT_ME
 
 
 def open_red_packet(api: FishPi, red_packet_id) -> None:
@@ -33,7 +38,13 @@ def open_rock_paper_scissors_packet(api: FishPi, red_packet_id) -> None:
     if ('code' in resp_json and resp_json['code'] == -1):
         print(resp_json['msg'])
         return
-    __open_redpacket_render(api.current_user, resp_json)
+    code = __open_redpacket_render(api.current_user, resp_json)
+    if code == CODE.SUCCESS:
+        api.chatroom.send(utils.RPS_SUCCESS)
+    elif code == CODE.LOSED:
+        api.chatroom.send(utils.RPS_LOSED)
+    elif code == CODE.ZERO:
+        api.chatroom.send(utils.RPS_ZERO)    
 
 
 def rush_redpacket(api: FishPi, redpacket):
@@ -54,10 +65,17 @@ def rush_redpacket(api: FishPi, redpacket):
             print('红包助手: '+sender+' 发送了一个心跳红包, 你选择跳过了这个心跳红包！不尝试赌一下人品吗？')
             return
     if content['type'] == 'rockPaperScissors':
-        print('红包助手: '+sender+' 发送了一个猜拳红包, 红包助手正在帮你猜拳，石头剪刀布！')
-        open_rock_paper_scissors_packet(api, redpacket['oId'])
+        print(
+            f'红包助手: {sender} 发送了一个猜拳红包, 但社区规定，助手抢红包要等{GLOBAL_CONFIG.redpacket_config.rate}秒哦～')
+        time.sleep(GLOBAL_CONFIG.redpacket_config.rate)
+        print('红包助手正在帮你猜拳，石头剪刀布！')
+        money = content['money']
+        if money > GLOBAL_CONFIG.redpacket_config.rps_limit:
+            print(f'红包助手: {sender} 发送了一个积分为({money})的猜拳红包, 怂了 不敢赌～')
+        else:
+            open_rock_paper_scissors_packet(api, redpacket['oId'])
     else:
-        print('红包助手: '+sender+' 发送了一个红包, 但社区规定，助手抢红包要等' +
+        print('红包助手: ' + sender+' 发送了一个红包, 但社区规定，助手抢红包要等' +
               str(GLOBAL_CONFIG.redpacket_config.rate)+'秒哦～')
         time.sleep(GLOBAL_CONFIG.redpacket_config.rate)
         open_red_packet(api, redpacket['oId'])

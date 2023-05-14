@@ -20,7 +20,7 @@ def __init__(api: FishPi, file_path: str = None):
         else:
             config.read(file_path, encoding='utf-8')
             GLOBAL_CONFIG.auth_config = __init_login_auth_config(config)
-            GLOBAL_CONFIG.redpacket_config = __int_redpacket_var(config)
+            GLOBAL_CONFIG.redpacket_config = __int_redpacket_config(config)
             GLOBAL_CONFIG.repeat_config = __init_repeat_config(config)
     except:
         print(f'{file_path}配置文件不合法')
@@ -36,10 +36,12 @@ def __init_default_config():
     GLOBAL_CONFIG.repeat_config = RepeatConfig()
 
 
-def __int_redpacket_var(config) -> RedPacketConfig:
+def __int_redpacket_config(config) -> RedPacketConfig:
     ret = RedPacketConfig()
     if config.getint('redPacket', 'rate') > 0:
         ret.rate = config.getint('redPacket', 'rate')
+    if config.getint('redPacket', 'rpsLimit') > 0:
+        ret.rps_limit = config.getint('redPacket', 'rpsLimit')            
     ret.red_packet_switch = config.getboolean(
         'redPacket', 'openRedPacket')
     ret.heartbeat = config.getboolean(
