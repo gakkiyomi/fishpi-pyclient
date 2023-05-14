@@ -8,13 +8,14 @@ import configparser
 import os
 
 
-def __init__(api: FishPi):
-    file_path = f'{os.getcwd()}/config.ini'
+def __init__(api: FishPi, file_path: str = None):
+    if file_path is None:   
+        file_path = f'{os.getcwd()}/config.ini'
     config = configparser.ConfigParser()
     try:
         print("配置读取中")
         if not os.path.exists(file_path):
-            print("config.ini配置文件不存在")
+            print(f'{file_path}配置文件不存在')
             __init_default_config()
         else:
             config.read(file_path, encoding='utf-8')
@@ -22,7 +23,7 @@ def __init__(api: FishPi):
             GLOBAL_CONFIG.redpacket_config = __int_redpacket_var(config)
             GLOBAL_CONFIG.repeat_config = __init_repeat_config(config)
     except:
-        print("config.ini配置文件不合法")
+        print(f'{file_path}配置文件不合法')
         __init_default_config()
     init_soliloquize(api)
     init_sys_in(api)

@@ -8,11 +8,20 @@ from src.utils.version import __version__
 from src.api import FishPi
 
 
-def run(params: dict):
+class CliConfig(object):
+    def __init__(self, username: str = '', password: str = '', code: str = '', file_path: str = None):
+        self.username = username
+        self.password = password
+        self.code = code
+        self.file_path = file_path
+
+
+def run(config: CliConfig):
     api = FishPi()
-    __init__(api)
-    if params:
-        GLOBAL_CONFIG.auth_config = AuthConfig.build(params)
+    __init__(api, config.file_path)
+    if config.username is not None and config.password is not None:
+        GLOBAL_CONFIG.auth_config = AuthConfig(
+            config.username, config.password, config.code)
     login(api)
     start(api)
 
@@ -22,15 +31,9 @@ def run(params: dict):
 @click.option("--username", "-u", type=click.STRING, help="摸鱼派用户名")
 @click.option("--password", "-p", type=click.STRING, help="密码")
 @click.option("--code", "-c", type=click.STRING, help="两步验证码")
-def cli(username: str, password: str, code: str) -> str:
-    if username is None or password is None:
-        run({})
-    else:
-        run({
-            'username': username,
-            'password': password,
-            '2fa_code': code
-        })
+@click.option("--file_path", "-f", type=click.STRING, help="配置文件路径")
+def cli(username: str, password: str, code: str, file_path: str) -> str:
+    run(CliConfig(username, password, code, file_path))
 
 
 if __name__ == "__main__":

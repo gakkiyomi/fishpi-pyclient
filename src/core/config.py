@@ -16,10 +16,6 @@ class AuthConfig(object):
         self.password = password
         self.mfa_code = mfa_code
 
-    @classmethod
-    def build(cls, map: dict):
-        return cls(map['username'], map['password'], map['2fa_code'])
-
 
 class RepeatConfig(object):
     def __init__(self, blacklist=[], repeat_mode_switch=False, frequency=5, soliloquize_switch=False,
