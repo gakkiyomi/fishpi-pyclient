@@ -51,12 +51,3 @@ class FishPi(Base):
         resp = requests.get(
             HOST + '/activity/yesterday-liveness-reward-api?apiKey=' + self.api_key, headers={'User-Agent': UA})
         return json.loads(resp.text)
-
-
-def from_instance(source: FishPi) -> FishPi:
-    newly = FishPi()
-    newly.user = source.user
-    newly.chatroom = source.chatroom
-    newly.api_key = source.api_key
-    newly.current_user = source.current_user
-    return newly
