@@ -1,3 +1,5 @@
+  ![摸鱼派cn.png](https://b3logfile.com/file/2023/05/摸鱼派-cn-owZQT8f.png)
+
 # pwl-chat-python
 
 > 摸鱼派聊天室 python 命令行客户端
