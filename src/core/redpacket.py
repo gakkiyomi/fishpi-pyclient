@@ -84,9 +84,11 @@ def rush_redpacket(api: FishPi, redpacket):
 def __analyzeHeartbeatRedPacket(api: FishPi, red_packet_id):
     for data in api.chatroom.more()['data']:
         if data['oId'] == red_packet_id:
-            __analyze(api, json.loads(data['content']),
-                      red_packet_id, data['time'], data['userName'])
-            return
+            if data['content']:
+                __analyze(api, json.loads(data['content']), red_packet_id, data['time'], data['userName'])
+            else:
+                return
+        return    
     print("红包助手: 你与此红包无缘")
 
 
