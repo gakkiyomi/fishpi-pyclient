@@ -25,11 +25,11 @@ def console_input(api: FishPi):
             else:
                 print('今日还未签到，摸鱼也要努力呀！')
         elif msg == '#reward':
-            if api.get_yesterday_reward()['sum'] == -1:
+            reward = api.get_yesterday_reward()['sum']
+            if reward == -1:
                 print('你已经领取过昨日活跃度奖励了')
             else:
-                print('领取昨日活跃度奖励 积分: ' +
-                      str(api.user.get_liveness_info()['sum']))
+                print(f'领取昨日活跃度奖励 积分: {reward}')
         elif msg == '#liveness':
             print('当前活跃度: ' +
                   str(api.user.get_liveness_info()['liveness']))
