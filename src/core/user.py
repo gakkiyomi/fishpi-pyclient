@@ -32,8 +32,8 @@ def login(api: FishPi):
                         GLOBAL_CONFIG.auth_config.password, GLOBAL_CONFIG.auth_config.mfa_code)
     if success:
         print(HELP)
-        if len(GLOBAL_CONFIG.repeat_config.blacklist) > 0:
-            print('小黑屋成员: ' + str(GLOBAL_CONFIG.repeat_config.blacklist))
+        if len(GLOBAL_CONFIG.chat_config.blacklist) > 0:
+            print('小黑屋成员: ' + str(GLOBAL_CONFIG.chat_config.blacklist))
     else:
         while len(api.api_key) == 0:
             time.sleep(3)

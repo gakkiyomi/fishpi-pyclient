@@ -44,7 +44,7 @@ def console_input(api: FishPi):
             if userInfo is not None:
                 render_user_info(userInfo)
         elif msg == '#blacklist':
-            print(GLOBAL_CONFIG.repeat_config.blacklist)
+            print(GLOBAL_CONFIG.chat_config.blacklist)
         elif msg.startswith('#ban '):
             user = msg.split()[1]
             ban_someone(api, user)
