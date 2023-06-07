@@ -13,7 +13,7 @@ def __init__(api: FishPi, file_path: str = None):
         file_path = f'{os.getcwd()}/config.ini'
     config = configparser.ConfigParser()
     try:
-        print("配置读取中")
+        print("配置读取中...")
         if not os.path.exists(file_path):
             print(f'{file_path}配置文件不存在')
             __init_default_config()

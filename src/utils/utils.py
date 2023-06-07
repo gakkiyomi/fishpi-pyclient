@@ -3,7 +3,10 @@ UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML,
 
 HELP = '输入#help获得命令提示列表'
 
-COMMAND_GUIDE = '''[#checked] 查看当前是否签到
+COMMAND_GUIDE = '''
+[#cli] 进入命令交互模式
+[#chatroom] 进入聊天室模式
+[#checked] 查看当前是否签到
 [#reward] 领取昨日活跃奖励
 [#point] 查看当前个人积分
 [#online-users] 查看当前在线的用户列表

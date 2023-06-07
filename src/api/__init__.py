@@ -12,6 +12,7 @@ import json
 
 class FishPi(Base):
     def __init__(self):
+        self.ws = None
         self.current_user = ''
         self.user = User()
         self.chatroom = ChatRoom()
@@ -37,17 +38,15 @@ class FishPi(Base):
         if rsp['code'] == 0:
             self.set_token(rsp['Key'])
             self.set_current_user(username)
-            print("登陆成功 欢迎" + username + '进入聊天室!')
-            print("更多功能与趣味游戏请访问网页端: " + HOST)
+            print(f'登陆成功! 更多功能与趣味游戏请访问网页端: {HOST}')
             return True
         elif rsp['code'] == -1 and rsp['msg'] == '两步验证失败，请填写正确的一次性密码':
             print("请输入两步验证码:")
             return False
         else:
-            print("登陆失败: " + rsp['msg'])
+            print(f"登陆失败: {rsp['msg']}")
             sys.exit(1)
 
     def get_yesterday_reward(self) -> dict:
-        resp = requests.get(
-            HOST + '/activity/yesterday-liveness-reward-api?apiKey=' + self.api_key, headers={'User-Agent': UA})
+        resp = requests.get(f'{HOST}/activity/yesterday-liveness-reward-api?apiKey={self.api_key}', headers={'User-Agent': UA})
         return json.loads(resp.text)
