@@ -39,6 +39,7 @@ def listener(api: FishPi, message):
         else:
             time = message['time']
             user = message['userName']
+            user_nick_name = message['userNickname']
             if len(GLOBAL_CONFIG.repeat_config.blacklist) > 0 \
                     and GLOBAL_CONFIG.repeat_config.blacklist.__contains__(user):
                 return
@@ -50,7 +51,10 @@ def listener(api: FishPi, message):
                     print('[' + time + '] 来自(' + message['client']+')')
                 else:
                     print('[' + time + ']')
-                print(user + '说:')
+                if len(user_nick_name) >0:
+                    print(f'{user_nick_name}({user})说:')
+                else:
+                    print(f'{user}说:')
                 print(message['md'])
                 print('\r\n')
             if GLOBAL_CONFIG.repeat_config.repeat_mode_switch:
