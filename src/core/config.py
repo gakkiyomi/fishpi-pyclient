@@ -18,7 +18,7 @@ class AuthConfig(object):
         self.mfa_code = mfa_code
 
 
-class RepeatConfig(object):
+class ChatConfig(object):
     def __init__(self, blacklist=[], repeat_mode_switch=False, frequency=5, soliloquize_switch=False,
                  soliloquize_frequency=20, sentences=[]):
         self.repeat_mode_switch = repeat_mode_switch
@@ -31,10 +31,10 @@ class RepeatConfig(object):
 
 
 class Config(object):
-    def __init__(self, auth: AuthConfig = None, redpacket: RedPacketConfig = None, repeat: RepeatConfig = None):
+    def __init__(self, auth: AuthConfig = None, redpacket: RedPacketConfig = None, chat: ChatConfig = None):
         self.auth_config = auth
         self.redpacket_config = redpacket
-        self.repeat_config = repeat
+        self.chat_config = chat
 
 
 GLOBAL_CONFIG = Config()

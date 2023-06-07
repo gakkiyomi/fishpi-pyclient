@@ -28,7 +28,7 @@ def heartbeat(ws):
     while True:
         time.sleep(60)
         ws.send("-hb-")
-        if GLOBAL_CONFIG.repeat_config.soliloquize_switch:
+        if GLOBAL_CONFIG.chat_config.soliloquize_switch:
             schedule.run_pending()
 
 
