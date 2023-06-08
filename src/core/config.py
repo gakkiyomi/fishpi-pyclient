@@ -31,10 +31,10 @@ class ChatConfig(object):
 
 
 class Config(object):
-    def __init__(self, auth: AuthConfig = None, redpacket: RedPacketConfig = None, chat: ChatConfig = None):
+    def __init__(self, auth: AuthConfig = None, redpacket: RedPacketConfig = None, chat: ChatConfig = None, cfg_path :str = None):
         self.auth_config = auth
         self.redpacket_config = redpacket
         self.chat_config = chat
-
+        self.cfg_path = cfg_path
 
 GLOBAL_CONFIG = Config()

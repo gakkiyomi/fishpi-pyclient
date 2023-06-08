@@ -22,6 +22,7 @@ def __init__(api: FishPi, file_path: str = None):
             GLOBAL_CONFIG.auth_config = __init_login_auth_config(config)
             GLOBAL_CONFIG.redpacket_config = __int_redpacket_config(config)
             GLOBAL_CONFIG.chat_config = __init_chat_config(config)
+            GLOBAL_CONFIG.cfg_path = file_path
     except:
         print(f'{file_path}配置文件不合法')
         __init_default_config()
@@ -34,7 +35,7 @@ def __init_default_config():
     GLOBAL_CONFIG.auth_config = AuthConfig()
     GLOBAL_CONFIG.redpacket_config = RedPacketConfig()
     GLOBAL_CONFIG.chat_config = ChatConfig()
-
+    GLOBAL_CONFIG.cfg_path = None
 
 def __int_redpacket_config(config) -> RedPacketConfig:
     ret = RedPacketConfig()
