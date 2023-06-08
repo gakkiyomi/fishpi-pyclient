@@ -3,7 +3,7 @@ import json
 from src.api import FishPi
 from .chatroom import init_soliloquize
 from .cli import init_sys_in
-from .config import GLOBAL_CONFIG, RedPacketConfig, AuthConfig, RepeatConfig
+from .config import GLOBAL_CONFIG, RedPacketConfig, AuthConfig, ChatConfig
 import configparser
 import os
 
@@ -13,7 +13,7 @@ def __init__(api: FishPi, file_path: str = None):
         file_path = f'{os.getcwd()}/config.ini'
     config = configparser.ConfigParser()
     try:
-        print("配置读取中")
+        print("配置读取中...")
         if not os.path.exists(file_path):
             print(f'{file_path}配置文件不存在')
             __init_default_config()
@@ -21,7 +21,8 @@ def __init__(api: FishPi, file_path: str = None):
             config.read(file_path, encoding='utf-8')
             GLOBAL_CONFIG.auth_config = __init_login_auth_config(config)
             GLOBAL_CONFIG.redpacket_config = __int_redpacket_config(config)
-            GLOBAL_CONFIG.repeat_config = __init_repeat_config(config)
+            GLOBAL_CONFIG.chat_config = __init_chat_config(config)
+            GLOBAL_CONFIG.cfg_path = file_path
     except:
         print(f'{file_path}配置文件不合法')
         __init_default_config()
@@ -33,8 +34,8 @@ def __init_default_config():
     print("加载默认配置文件")
     GLOBAL_CONFIG.auth_config = AuthConfig()
     GLOBAL_CONFIG.redpacket_config = RedPacketConfig()
-    GLOBAL_CONFIG.repeat_config = RepeatConfig()
-
+    GLOBAL_CONFIG.chat_config = ChatConfig()
+    GLOBAL_CONFIG.cfg_path = None
 
 def __int_redpacket_config(config) -> RedPacketConfig:
     ret = RedPacketConfig()
@@ -64,8 +65,8 @@ def __init_login_auth_config(config) -> AuthConfig:
                       config.get('auth', 'password'))
 
 
-def __init_repeat_config(config) -> RepeatConfig:
-    ret = RepeatConfig()
+def __init_chat_config(config) -> ChatConfig:
+    ret = ChatConfig()
     ret.repeat_mode_switch = config.getboolean('chat', 'repeatMode')
     ret.frequency = config.getint('chat', 'repeatFrequency')
     ret.soliloquize_switch = config.getboolean('chat', 'soliloquizeMode')

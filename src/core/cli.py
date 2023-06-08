@@ -2,6 +2,7 @@ import _thread
 from .blacklist import *
 from .config import GLOBAL_CONFIG
 from .user import *
+from .websocket import chatroom_in,chatroom_out
 from src.utils.utils import *
 
 
@@ -18,7 +19,16 @@ def console_input(api: FishPi):
             print(COMMAND_GUIDE)
         elif len(api.api_key) == 0:
             api.login(GLOBAL_CONFIG.auth_config.username,
-                      GLOBAL_CONFIG.auth_config.password, msg)
+                      GLOBAL_CONFIG.auth_config.password, msg)                
+        elif msg == '#cli':
+            if api.ws == None:
+                print("已经进入交互模式了")
+            else:    
+                chatroom_out(api)
+                print("进入交互模式")
+        elif msg == '#chatroom':
+            if api.ws == None:
+               api.ws = chatroom_in(api)
         elif msg == '#checked':
             if api.user.checked_status()['checkedIn']:
                 print('今日你已签到！')
@@ -34,8 +44,7 @@ def console_input(api: FishPi):
             print('当前活跃度: ' +
                   str(api.user.get_liveness_info()['liveness']))
         elif msg == '#point':
-            print(
-                '当前积分: ' + str(api.user.get_user_info(GLOBAL_CONFIG.auth_config.username)['userPoint']))
+            print('当前积分: ' + str(api.user.get_user_info(GLOBAL_CONFIG.auth_config.username)['userPoint']))
         elif msg == '#online-users':
             render_online_users(api)
         elif msg.startswith('#user '):
@@ -44,12 +53,15 @@ def console_input(api: FishPi):
             if userInfo is not None:
                 render_user_info(userInfo)
         elif msg == '#blacklist':
-            print(GLOBAL_CONFIG.repeat_config.blacklist)
+            print(GLOBAL_CONFIG.chat_config.blacklist)
         elif msg.startswith('#ban '):
             user = msg.split()[1]
             ban_someone(api, user)
         elif msg.startswith('#unban '):
             user = msg.split()[1]
             unban_someone(api, user)
+        elif msg.startswith('#'):
+            print('命令错误,请查看命令引导手册')
+            print(COMMAND_GUIDE)
         else:
             api.chatroom.send(msg)
