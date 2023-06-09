@@ -6,6 +6,7 @@ HELP = '输入#help获得命令提示列表'
 COMMAND_GUIDE = '''
 [#cli] 进入命令交互模式
 [#chatroom] 进入聊天室模式
+[#answer] 进入|退出 答题模式
 [#checked] 查看当前是否签到
 [#reward] 领取昨日活跃奖励
 [#point] 查看当前个人积分

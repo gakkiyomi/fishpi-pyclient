@@ -29,6 +29,13 @@ def console_input(api: FishPi):
         elif msg == '#chatroom':
             if api.ws == None:
                api.ws = chatroom_in(api)
+        elif msg == '#answer':
+            if GLOBAL_CONFIG.chat_config.answerMode:
+                GLOBAL_CONFIG.chat_config.answerMode = False
+                print('退出答题模式')
+            else:
+                GLOBAL_CONFIG.chat_config.answerMode = True
+                print('进入答题模式')
         elif msg == '#checked':
             if api.user.checked_status()['checkedIn']:
                 print('今日你已签到！')
@@ -64,4 +71,7 @@ def console_input(api: FishPi):
             print('命令错误,请查看命令引导手册')
             print(COMMAND_GUIDE)
         else:
-            api.chatroom.send(msg)
+            if GLOBAL_CONFIG.chat_config.answerMode:
+                api.chatroom.send(f'鸽 {msg}')
+            else:
+                api.chatroom.send(msg)
