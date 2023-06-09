@@ -19,7 +19,7 @@ class ChatRoom(Base):
         if self.api_key == '':
             return None
         params = {'apiKey': self.api_key, 'content': message,
-                  'client': f'Python/{__version__}'}
+                  'client': f'Python/客户端v{__version__}'}
         ret = requests.post(HOST + "/chat-room/send",
                             json=params, headers={'User-Agent': UA})
         ret_json = json.loads(ret.text)
