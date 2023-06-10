@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 import click
-import rel
 from src.core import __init__
 from src.core.config import GLOBAL_CONFIG, AuthConfig
 from src.core.user import login
-from src.core.websocket import chatroom_in
+from src.core.cli import console_input
+from src.core.websocket import init_chatroom
 from src.utils.version import __version__
-from src.api import FishPi
+from src.api import API
 
 
 class CliConfig(object):
@@ -18,20 +18,14 @@ class CliConfig(object):
 
 
 def run(config: CliConfig):
-    api = FishPi()
-    __init__(api, config.file_path)
+    __init__(API, config.file_path)
     if config.username is not None and config.password is not None:
         GLOBAL_CONFIG.auth_config = AuthConfig(
             config.username, config.password, config.code)
-    login(api)
-    rel.safe_read()
-    api.ws = chatroom_in(api)
-    pending()
+    login(API)
+    init_chatroom(API)
+    console_input(API)
 
-    
-def pending():
-    rel.signal(2, rel.abort)
-    rel.dispatch()
 
 @click.command()
 @click.version_option(__version__)

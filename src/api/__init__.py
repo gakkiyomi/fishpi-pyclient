@@ -12,11 +12,15 @@ import json
 
 class FishPi(Base):
     def __init__(self):
+        self.ws_calls = []
         self.ws = None
         self.current_user = ''
         self.user = User()
         self.chatroom = ChatRoom()
         Base.__init__(self)
+
+    def add_listener(self, listener):
+        self.ws_calls.append(listener)
 
     def set_current_user(self, username):
         self.current_user = username
@@ -50,3 +54,6 @@ class FishPi(Base):
     def get_yesterday_reward(self) -> dict:
         resp = requests.get(f'{HOST}/activity/yesterday-liveness-reward-api?apiKey={self.api_key}', headers={'User-Agent': UA})
         return json.loads(resp.text)
+
+
+API = FishPi()
