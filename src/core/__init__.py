@@ -2,7 +2,6 @@ import json
 
 from src.api import FishPi
 from .chatroom import init_soliloquize
-from .cli import init_sys_in
 from .config import GLOBAL_CONFIG, RedPacketConfig, AuthConfig, ChatConfig
 import configparser
 import os
@@ -27,7 +26,6 @@ def __init__(api: FishPi, file_path: str = None):
         print(f'{file_path}配置文件不合法')
         __init_default_config()
     init_soliloquize(api)
-    init_sys_in(api)
 
 
 def __init_default_config():

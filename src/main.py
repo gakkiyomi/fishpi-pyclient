@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import click
-import rel
 from src.core import __init__
 from src.core.config import GLOBAL_CONFIG, AuthConfig
 from src.core.user import login
-from src.core.websocket import chatroom_in
+from src.core.cli import console_input
+from src.core.websocket import init_chatroom
 from src.utils.version import __version__
 from src.api import FishPi
 
@@ -24,14 +24,9 @@ def run(config: CliConfig):
         GLOBAL_CONFIG.auth_config = AuthConfig(
             config.username, config.password, config.code)
     login(api)
-    rel.safe_read()
-    api.ws = chatroom_in(api)
-    pending()
+    init_chatroom(api) 
+    console_input(api)
 
-    
-def pending():
-    rel.signal(2, rel.abort)
-    rel.dispatch()
 
 @click.command()
 @click.version_option(__version__)
