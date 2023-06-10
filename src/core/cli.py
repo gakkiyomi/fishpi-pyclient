@@ -1,9 +1,10 @@
+import re
 from .blacklist import *
 from .config import GLOBAL_CONFIG
 from .user import *
 from .websocket import chatroom_out,init_chatroom
+from src.api.redpacket import *
 from src.utils.utils import *
-
 
 
 
@@ -26,7 +27,45 @@ def console_input(api: FishPi):
                init_chatroom(api)
             else:
                chatroom_out(api)
-               init_chatroom(api)  
+               init_chatroom(api)         
+        elif msg == "#rp":
+               api.chatroom.send_redpacket()       
+        elif msg == "#rp-ave":
+               api.chatroom.send_redpacket(RedPacket('人人有份!', 32, 5, RedPacketType.AVERAGE))
+        elif msg == "#rp-hb":
+               api.chatroom.send_redpacket(RedPacket('慎点!', 32, 5, RedPacketType.HEARTBEAT))
+        elif msg == "#rp-rps":
+               api.chatroom.send_redpacket(RPSRedPacket('剪刀石头布!', 32, 0))
+        elif msg.startswith('#rp-to'):
+            res = re.fullmatch(RP_SEND_TO_CODE_RE, msg)
+            if res is not None:
+                api.chatroom.send_redpacket(SpecifyRedPacket('给你!', res.group(1), res.group(2).replace('，',',').split(",")))
+            else:
+                print('非法红包指令')               
+        elif msg.startswith('#rp-ave'):
+            res = re.fullmatch(RP_AVER_CODE_RE,msg)
+            if res is not None:
+                api.chatroom.send_redpacket(RedPacket('人人有份!', res.group(2), res.group(1), RedPacketType.AVERAGE))
+            else:
+                print('非法红包指令')       
+        elif msg.startswith('#rp-hb'):
+            res = re.fullmatch(RP_HB_CODE_RE,msg)
+            if res is not None:
+                api.chatroom.send_redpacket(RedPacket('人人有份!', res.group(2), res.group(1), RedPacketType.HEARTBEAT))
+            else:
+                print('非法红包指令')  
+        elif msg.startswith('#rp-rps'):
+            res = re.fullmatch(RP_RPS_CODE_RE,msg)
+            if res is not None:
+                api.chatroom.send_redpacket(RPSRedPacket('剪刀石头布!', res.group(2), res.group(1)))
+            else:
+                print('非法红包指令')
+        elif msg.startswith('#rp'):
+            res = re.fullmatch(RP_CODE_RE,msg)
+            if res is not None:
+                api.chatroom.send_redpacket(RedPacket('那就看运气吧!', res.group(2), res.group(1), RedPacketType.RANDOM))
+            else:
+                print('非法红包指令')                                                             
         elif msg == '#answer':
             if GLOBAL_CONFIG.chat_config.answerMode:
                 GLOBAL_CONFIG.chat_config.answerMode = False

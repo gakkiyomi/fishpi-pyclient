@@ -1,3 +1,4 @@
+import re
 HOST = 'https://fishpi.cn'
 UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'
 
@@ -6,6 +7,11 @@ HELP = '输入#help获得命令提示列表'
 COMMAND_GUIDE = '''
 [#cli] 进入命令交互模式
 [#chatroom] 进入聊天室模式
+[#rp] 拼手气红包 1128 1个128积分 (默认5个,128积分)
+[#rp-ave] 平均红包 1128 1个128积分 (默认5个,32积分)
+[#rp-hb] 心跳红包 5128 5个128积分 (默认5个,32积分)
+[#rp-rps] 猜拳红包 0128 128积分 (0=石头 1=剪刀 2=布)
+[#rp-to] 专属红包 32 Gakkiyomi (积分 用户)
 [#answer] 进入|退出 答题模式
 [#checked] 查看当前是否签到
 [#reward] 领取昨日活跃奖励
@@ -21,3 +27,11 @@ COMMAND_GUIDE = '''
 RPS_SUCCESS = '![](https://file.fishpi.cn/2023/01/XN3Y9-cf3997b7.jpeg)'
 RPS_LOSED = '![](https://pwl.stackoverflow.wiki/2022/04/MB2SCYFZFVT2DQ0GI7-c6447c10.jpg)'
 RPS_ZERO = '![](https://file.fishpi.cn/2023/05/1683183148506-4c31497e.png)'
+
+
+
+RP_CODE_RE = re.compile('#rp\s{1,1}(\d)(\d+)')
+RP_AVER_CODE_RE = re.compile('#rp-ave\s{1,1}(\d)(\d+)')
+RP_HB_CODE_RE = re.compile('#rp-hb\s{1,1}(\d)(\d+)')
+RP_RPS_CODE_RE = re.compile('#rp-rps\s{1,1}(\d)(\d+)')
+RP_SEND_TO_CODE_RE = re.compile('#rp-to (\d+) ([\w,]+)(?<!,)$')

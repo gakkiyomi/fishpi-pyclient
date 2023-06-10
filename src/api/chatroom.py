@@ -1,6 +1,7 @@
 import requests
 import json
 import random
+from .redpacket import *
 from src.utils.utils import UA, HOST
 from src.utils.version import __version__
 from .__api__ import Base
@@ -25,6 +26,12 @@ class ChatRoom(Base):
         ret_json = json.loads(ret.text)
         if ('code' in ret_json and ret_json['code'] == -1):
             print(ret_json['msg'])
+            
+
+    def send_redpacket(self, redpacket :RedPacket=RedPacket('最后的发', 128, 5,RedPacketType.RANDOM)):
+        content = f'[redpacket]{json.dumps(redpacket.__json__())}[/redpacket]'
+        print(content)
+        self.send(content)        
 
     def open_redpacket(self, red_packet_id) -> dict:
         params = {
