@@ -6,6 +6,7 @@ from src.utils.utils import *
 
 
 
+
 def console_input(api: FishPi):
     while True:
         msg = input("")
