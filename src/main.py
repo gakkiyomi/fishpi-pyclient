@@ -6,7 +6,7 @@ from src.core.user import login
 from src.core.cli import console_input
 from src.core.websocket import init_chatroom
 from src.utils.version import __version__
-from src.api import FishPi
+from src.api import API
 
 
 class CliConfig(object):
@@ -18,14 +18,13 @@ class CliConfig(object):
 
 
 def run(config: CliConfig):
-    api = FishPi()
-    __init__(api, config.file_path)
+    __init__(API, config.file_path)
     if config.username is not None and config.password is not None:
         GLOBAL_CONFIG.auth_config = AuthConfig(
             config.username, config.password, config.code)
-    login(api)
-    init_chatroom(api) 
-    console_input(api)
+    login(API)
+    init_chatroom(API)
+    console_input(API)
 
 
 @click.command()

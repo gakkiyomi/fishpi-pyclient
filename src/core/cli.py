@@ -1,4 +1,3 @@
-import _thread
 from .blacklist import *
 from .config import GLOBAL_CONFIG
 from .user import *
@@ -6,9 +5,6 @@ from .websocket import chatroom_out,init_chatroom
 from src.utils.utils import *
 
 
-
-def init_sys_in(api: FishPi):
-    _thread.start_new_thread(console_input, (api,))
 
 
 def console_input(api: FishPi):
@@ -28,6 +24,9 @@ def console_input(api: FishPi):
         elif msg == '#chatroom':
             if api.ws == None:
                init_chatroom(api)
+            else:
+               chatroom_out(api)
+               init_chatroom(api)  
         elif msg == '#answer':
             if GLOBAL_CONFIG.chat_config.answerMode:
                 GLOBAL_CONFIG.chat_config.answerMode = False

@@ -1,7 +1,7 @@
 import json
 
 from src.api import FishPi
-from .chatroom import init_soliloquize
+from .chatroom import init_soliloquize, listener
 from .config import GLOBAL_CONFIG, RedPacketConfig, AuthConfig, ChatConfig
 import configparser
 import os
@@ -25,8 +25,12 @@ def __init__(api: FishPi, file_path: str = None):
     except:
         print(f'{file_path}配置文件不合法')
         __init_default_config()
+    __init_message_listener(api)
     init_soliloquize(api)
 
+
+def __init_message_listener(api :FishPi):
+    api.add_listener(listener)
 
 def __init_default_config():
     print("加载默认配置文件")
