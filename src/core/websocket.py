@@ -1,6 +1,6 @@
 import json
 import ssl
-import rel
+import _thread
 import schedule
 import websocket
 
@@ -34,7 +34,7 @@ def chatroom_out(api: FishPi):
     api.ws.close()
     api.ws = None
 
-def chatroom_in(api: FishPi) -> websocket.WebSocketApp:
+def chatroom_in(api: FishPi):
     global __api
     __api = api
     websocket.enableTrace(False)
@@ -43,5 +43,8 @@ def chatroom_in(api: FishPi) -> websocket.WebSocketApp:
                                 on_message=on_message,
                                 on_error=on_error,
                                 on_close=on_close)
-    ws.run_forever(dispatcher=rel, sslopt={"cert_reqs": ssl.CERT_NONE})
-    return ws
+    api.ws = ws
+    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+    
+def init_chatroom(api: FishPi):
+    _thread.start_new_thread(chatroom_in, (api,))    

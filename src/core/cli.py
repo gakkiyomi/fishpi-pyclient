@@ -2,9 +2,8 @@ import _thread
 from .blacklist import *
 from .config import GLOBAL_CONFIG
 from .user import *
-from .websocket import chatroom_in,chatroom_out
+from .websocket import chatroom_out,init_chatroom
 from src.utils.utils import *
-
 
 
 
@@ -28,7 +27,7 @@ def console_input(api: FishPi):
                 print("进入交互模式")
         elif msg == '#chatroom':
             if api.ws == None:
-               api.ws = chatroom_in(api)
+               init_chatroom(api)
         elif msg == '#answer':
             if GLOBAL_CONFIG.chat_config.answerMode:
                 GLOBAL_CONFIG.chat_config.answerMode = False
@@ -71,7 +70,10 @@ def console_input(api: FishPi):
             print('命令错误,请查看命令引导手册')
             print(COMMAND_GUIDE)
         else:
-            if GLOBAL_CONFIG.chat_config.answerMode:
-                api.chatroom.send(f'鸽 {msg}')
+            if api.ws is not None:
+                if GLOBAL_CONFIG.chat_config.answerMode:
+                    api.chatroom.send(f'鸽 {msg}')
+                else:
+                    api.chatroom.send(msg)
             else:
-                api.chatroom.send(msg)
+                print("请输入正确指令")        
