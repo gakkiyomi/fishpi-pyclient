@@ -25,7 +25,7 @@ VERSION = __version__
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'requests', 'websocket-client', 'rel', 'click', 'schedule'
+    'requests', 'websocket-client', 'click', 'schedule'
 ]
 
 # What packages are optional?

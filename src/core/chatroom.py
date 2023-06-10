@@ -29,8 +29,7 @@ def soliloquize(api: FishPi) -> None:
     index = random.randint(0, length - 1)
     api.chatroom.send(GLOBAL_CONFIG.chat_config.sentences[index])
 
-
-def listener(api: FishPi, message) -> None:
+def listener(api: FishPi, message :dict) -> None:
     if message['type'] == 'msg':
         if message['content'].find("redPacket") != -1:
             rush_redpacket(api, message)

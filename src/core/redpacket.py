@@ -49,6 +49,10 @@ def open_rock_paper_scissors_packet(api: FishPi, red_packet_id) -> None:
 
 def rush_redpacket(api: FishPi, redpacket):
     sender = redpacket['userName']
+    if sender == api.current_user:
+        print('\t\t\t\t\t\t[' + redpacket['time'] + ']')
+        print('\t\t\t\t\t\t发送了一个红包')
+        return
     if (GLOBAL_CONFIG.redpacket_config.red_packet_switch == False):
         print('红包助手: '+sender+'发送了一个红包 你错过了这个红包，请开启抢红包模式！')
         return
