@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import click
+import rel
 from src.core import __init__
 from src.core.config import GLOBAL_CONFIG, AuthConfig
 from src.core.user import login
@@ -25,7 +26,6 @@ def run(config: CliConfig):
     login(API)
     init_chatroom(API)
     console_input(API)
-
 
 @click.command()
 @click.version_option(__version__)
