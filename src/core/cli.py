@@ -1,15 +1,11 @@
-import _thread
+import re
 from .blacklist import *
 from .config import GLOBAL_CONFIG
 from .user import *
-from .websocket import chatroom_in,chatroom_out
+from .websocket import chatroom_out,init_chatroom
+from src.api.redpacket import *
 from src.utils.utils import *
 
-
-
-
-def init_sys_in(api: FishPi):
-    _thread.start_new_thread(console_input, (api,))
 
 
 def console_input(api: FishPi):
@@ -28,7 +24,55 @@ def console_input(api: FishPi):
                 print("进入交互模式")
         elif msg == '#chatroom':
             if api.ws == None:
-               api.ws = chatroom_in(api)
+               init_chatroom(api)
+            else:
+               chatroom_out(api)
+               init_chatroom(api)         
+        elif msg == "#rp":
+               api.chatroom.send_redpacket()       
+        elif msg == "#rp-ave":
+               api.chatroom.send_redpacket(RedPacket('人人有份!', 32, 5, RedPacketType.AVERAGE))
+        elif msg == "#rp-hb":
+               api.chatroom.send_redpacket(RedPacket('慎点!', 32, 5, RedPacketType.HEARTBEAT))
+        elif msg == "#rp-rps":
+               api.chatroom.send_redpacket(RPSRedPacket('剪刀石头布!', 32, 0))
+        elif msg.startswith('#rp-to'):
+            res = re.fullmatch(RP_SEND_TO_CODE_RE, msg)
+            if res is not None:
+                api.chatroom.send_redpacket(SpecifyRedPacket('给你!', res.group(1), res.group(2).replace('，',',').split(",")))
+            else:
+                print('非法红包指令')               
+        elif msg.startswith('#rp-ave'):
+            res = re.fullmatch(RP_AVER_CODE_RE,msg)
+            if res is not None:
+                api.chatroom.send_redpacket(RedPacket('人人有份!', res.group(2), res.group(1), RedPacketType.AVERAGE))
+            else:
+                print('非法红包指令')       
+        elif msg.startswith('#rp-hb'):
+            res = re.fullmatch(RP_HB_CODE_RE,msg)
+            if res is not None:
+                api.chatroom.send_redpacket(RedPacket('人人有份!', res.group(2), res.group(1), RedPacketType.HEARTBEAT))
+            else:
+                print('非法红包指令')  
+        elif msg.startswith('#rp-rps'):
+            res = re.fullmatch(RP_RPS_CODE_RE,msg)
+            if res is not None:
+                api.chatroom.send_redpacket(RPSRedPacket('剪刀石头布!', res.group(2), res.group(1)))
+            else:
+                print('非法红包指令')
+        elif msg.startswith('#rp'):
+            res = re.fullmatch(RP_CODE_RE,msg)
+            if res is not None:
+                api.chatroom.send_redpacket(RedPacket('那就看运气吧!', res.group(2), res.group(1), RedPacketType.RANDOM))
+            else:
+                print('非法红包指令')                                                             
+        elif msg == '#answer':
+            if GLOBAL_CONFIG.chat_config.answerMode:
+                GLOBAL_CONFIG.chat_config.answerMode = False
+                print('退出答题模式')
+            else:
+                GLOBAL_CONFIG.chat_config.answerMode = True
+                print('进入答题模式')
         elif msg == '#checked':
             if api.user.checked_status()['checkedIn']:
                 print('今日你已签到！')
@@ -64,4 +108,10 @@ def console_input(api: FishPi):
             print('命令错误,请查看命令引导手册')
             print(COMMAND_GUIDE)
         else:
-            api.chatroom.send(msg)
+            if api.ws is not None:
+                if GLOBAL_CONFIG.chat_config.answerMode:
+                    api.chatroom.send(f'鸽 {msg}')
+                else:
+                    api.chatroom.send(msg)
+            else:
+                print("请输入正确指令")        
