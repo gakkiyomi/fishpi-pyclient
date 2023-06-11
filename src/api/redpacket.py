@@ -25,7 +25,7 @@ class RedPacket:
         
 class SpecifyRedPacket(RedPacket):
     def __init__(self, msg :str = '给!', money :int = 32, send_to :list = []):
-        super().__init__(msg, money, 1, RedPacketType.SPECIFY)
+        super().__init__(msg, money, len(send_to), RedPacketType.SPECIFY)
         self.recivers = send_to
 
     def __json__(self):
