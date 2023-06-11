@@ -8,28 +8,9 @@ from src.utils.utils import *
 
 
 
-def console_input(api: FishPi):
-    while True:
-        msg = input("")
-        if msg == '#help':
-            print(COMMAND_GUIDE)
-        elif len(api.api_key) == 0:
-            api.login(GLOBAL_CONFIG.auth_config.username,
-                      GLOBAL_CONFIG.auth_config.password, msg)                
-        elif msg == '#cli':
-            if api.ws == None:
-                print("已经进入交互模式了")
-            else:    
-                chatroom_out(api)
-                print("进入交互模式")
-        elif msg == '#chatroom':
-            if api.ws == None:
-               init_chatroom(api)
-            else:
-               chatroom_out(api)
-               init_chatroom(api)         
-        elif msg == "#rp":
-               api.chatroom.send_redpacket()       
+def __send_redpacket_handler(api :FishPi, msg :str):
+        if  msg == "#rp":
+               api.chatroom.send_redpacket()
         elif msg == "#rp-ave":
                api.chatroom.send_redpacket(RedPacket('人人有份!', 32, 5, RedPacketType.AVERAGE))
         elif msg == "#rp-hb":
@@ -53,11 +34,19 @@ def console_input(api: FishPi):
             if res is not None:
                 api.chatroom.send_redpacket(RedPacket('人人有份!', res.group(2), res.group(1), RedPacketType.HEARTBEAT))
             else:
-                print('非法红包指令')  
+                print('非法红包指令')
         elif msg.startswith('#rp-rps'):
             res = re.fullmatch(RP_RPS_CODE_RE,msg)
             if res is not None:
                 api.chatroom.send_redpacket(RPSRedPacket('剪刀石头布!', res.group(2), res.group(1)))
+            else:
+                print('非法红包指令')
+        elif msg.startswith('#rp-time'):
+            res = re.fullmatch(RP_TIME_CODE_RE,msg)
+            if res is not None:
+                time = res.group(1)
+                GLOBAL_CONFIG.redpacket_config.rate = int(time)
+                print(f'红包等待时间已设置成功 {time}s')
             else:
                 print('非法红包指令')
         elif msg.startswith('#rp'):
@@ -65,7 +54,40 @@ def console_input(api: FishPi):
             if res is not None:
                 api.chatroom.send_redpacket(RedPacket('那就看运气吧!', res.group(2), res.group(1), RedPacketType.RANDOM))
             else:
-                print('非法红包指令')                                                             
+                print('非法红包指令')
+                    
+
+
+def cli_handler(api: FishPi):
+    while True:
+        msg = input("")
+        if msg == '#help':
+            print(COMMAND_GUIDE)
+        elif len(api.api_key) == 0:
+            api.login(GLOBAL_CONFIG.auth_config.username,
+                      GLOBAL_CONFIG.auth_config.password, msg)                
+        elif msg == '#cli':
+            if api.ws == None:
+                print("已经进入交互模式了")
+            else:    
+                chatroom_out(api)
+                print("进入交互模式")
+        elif msg == '#chatroom':
+            if api.ws == None:
+               init_chatroom(api)
+            else:
+               chatroom_out(api)
+               init_chatroom(api)
+        elif msg.startswith('#bm'):
+            api.user.send_breezemoon(msg[msg.find(' ')+1:len(msg)])
+        elif msg.startswith('#transfer'):
+            res = re.fullmatch(TRANSFER_RE, msg)
+            if res is not None:
+                api.user.transfer(res.group(2), res.group(1), res.group(3))
+            else:
+               print('非法转账命令')    
+        elif msg.startswith('#rp'):
+            __send_redpacket_handler(api, msg)                                   
         elif msg == '#answer':
             if GLOBAL_CONFIG.chat_config.answerMode:
                 GLOBAL_CONFIG.chat_config.answerMode = False
@@ -79,11 +101,7 @@ def console_input(api: FishPi):
             else:
                 print('今日还未签到，摸鱼也要努力呀！')
         elif msg == '#reward':
-            reward = api.get_yesterday_reward()['sum']
-            if reward == -1:
-                print('你已经领取过昨日活跃度奖励了')
-            else:
-                print(f'领取昨日活跃度奖励 积分: {reward}')
+            api.user.get_yesterday_reward()
         elif msg == '#liveness':
             print('当前活跃度: ' +
                   str(api.user.get_liveness_info()['liveness']))

@@ -36,8 +36,7 @@ class FishPi(Base):
             'userPassword': hashlib.md5(str(password).encode('utf-8')).hexdigest(),
             'mfaCode': mfa_code
         }
-        res = requests.post(HOST + "/api/getKey", json=params,
-                            headers={'User-Agent': UA})
+        res = requests.post(f"{HOST}/api/getKey", json=params, headers={'User-Agent': UA})
         rsp = json.loads(res.text)
         if rsp['code'] == 0:
             self.set_token(rsp['Key'])
@@ -50,10 +49,6 @@ class FishPi(Base):
         else:
             print(f"登陆失败: {rsp['msg']}")
             sys.exit(1)
-
-    def get_yesterday_reward(self) -> dict:
-        resp = requests.get(f'{HOST}/activity/yesterday-liveness-reward-api?apiKey={self.api_key}', headers={'User-Agent': UA})
-        return json.loads(resp.text)
 
 
 API = FishPi()

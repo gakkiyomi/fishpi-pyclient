@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import click
-import rel
 from src.core import __init__
 from src.core.config import GLOBAL_CONFIG, AuthConfig
-from src.core.user import login
-from src.core.cli import console_input
+from src.core.user import login, auto_check_in
+from src.core.cli import cli_handler
 from src.core.websocket import init_chatroom
 from src.utils.version import __version__
 from src.api import API
@@ -24,8 +23,9 @@ def run(config: CliConfig):
         GLOBAL_CONFIG.auth_config = AuthConfig(
             config.username, config.password, config.code)
     login(API)
+    auto_check_in(API)
     init_chatroom(API)
-    console_input(API)
+    cli_handler(API)
 
 @click.command()
 @click.version_option(__version__)
