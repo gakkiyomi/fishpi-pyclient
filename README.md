@@ -35,6 +35,7 @@ python core.py
 - 💬 聊天模式
   - 💬 聊天吹水
   - 🤖️ 自动复读
+  - 🤖️ 自动领取昨日奖励
   - 🧠 自言自语
     - 自定义语句池
     - 定时发送
@@ -51,16 +52,25 @@ python core.py
     - 领取昨日活跃度奖励
     - 查看个人积分
     - 查看签到状态
+    - 转账
+    - 发送清风明月
     - 查看当前活跃度
     - 查看在线用户列表
     - 查询用户详细信息
     - 🈲️ 小黑屋功能
       - 拒绝接收黑名单在聊天室发送的信息 (红包除外 😂 )
       - 将某人从小黑屋中放出
-    - 发红包
+    - 发红包🧧
+      - 拼手气红包
+      - 普通红包
+      - 专属红包
+      - 心跳红包
+      - 猜拳红包
+      - 设置抢红包等待时间
 
 ## 效果
 
-![image.png](https://pwl.stackoverflow.wiki/2022/01/image-71dba0ea.png)
+![image.png](https://file.fishpi.cn/2023/06/image-d4da9bf7.png)
+![redpacket](https://file.fishpi.cn/2023/06/image-d0ad7756.png)
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-f74aae7e.png)
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-1b685256.png)

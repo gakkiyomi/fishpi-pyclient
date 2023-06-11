@@ -26,6 +26,11 @@ def render_online_users(api: FishPi):
         print('用户: ' + user['userName'])
         print('----------------------')
 
+def auto_check_in(api: FishPi):
+    if len(api.api_key) == 0:
+        print('未登录')
+    else:
+        api.user.get_yesterday_reward()
 
 def login(api: FishPi):
     success = api.login(GLOBAL_CONFIG.auth_config.username,

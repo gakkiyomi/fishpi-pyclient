@@ -7,14 +7,17 @@ HELP = '输入#help获得命令提示列表'
 COMMAND_GUIDE = '''
 [#cli] 进入命令交互模式
 [#chatroom] 进入聊天室模式
-[#rp] 拼手气红包 1128 1个128积分 (默认5个,128积分)
-[#rp-ave] 平均红包 1128 1个128积分 (默认5个,32积分)
-[#rp-hb] 心跳红包 5128 5个128积分 (默认5个,32积分)
-[#rp-rps] 猜拳红包 0128 128积分 (0=石头 1=剪刀 2=布)
-[#rp-to] 专属红包 32 Gakkiyomi (积分 用户)
+[#rp] 1128 1个128积分 (默认5个,128积分)拼手气红包
+[#rp-ave] 1128 1个128积分 (默认5个,32积分)平均红包
+[#rp-hb] 5128 5个128积分 (默认5个,32积分)心跳红包
+[#rp-rps] 0128 128积分 (0=石头 1=剪刀 2=布)猜拳红包
+[#rp-to] 32 Gakkiyomi,xiaoIce (积分 用户)专属红包
+[#rp-time] 3 设置抢红包等待时间
+[#bm] 发送清风明月
 [#answer] 进入|退出 答题模式
 [#checked] 查看当前是否签到
 [#reward] 领取昨日活跃奖励
+[#transfer] 32 Gakkiyomi 送给你 (积分 用户 留言)
 [#point] 查看当前个人积分
 [#online-users] 查看当前在线的用户列表
 [#user username] 输入 #user 用户名 可查看此用户详细信息 (#user Gakkiyomi)
@@ -35,3 +38,5 @@ RP_AVER_CODE_RE = re.compile('#rp-ave\s{1,1}(\d)(\d+)')
 RP_HB_CODE_RE = re.compile('#rp-hb\s{1,1}(\d)(\d+)')
 RP_RPS_CODE_RE = re.compile('#rp-rps\s{1,1}(\d)(\d+)')
 RP_SEND_TO_CODE_RE = re.compile('#rp-to (\d+) ([\w,]+)(?<!,)$')
+RP_TIME_CODE_RE = re.compile('#rp-time (\d+)')
+TRANSFER_RE = re.compile('#transfer (\d+) (\w+)( \S+)?')
