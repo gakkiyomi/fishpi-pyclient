@@ -26,7 +26,7 @@ class User(Base):
         return json.loads(resp.text)
 
     def get_yesterday_reward(self) -> None:
-        if self.reward == False:
+        if self.reward == True:
             print('你已经领取过昨日活跃度奖励了')
             return
         resp = requests.get(f'{HOST}/activity/yesterday-liveness-reward-api?apiKey={self.api_key}', headers={'User-Agent': UA})
