@@ -36,11 +36,19 @@ def __send_redpacket_handler(api :FishPi, msg :str):
             else:
                 print('非法红包指令')
         elif msg.startswith('#rp-rps'):
-            res = re.fullmatch(RP_RPS_CODE_RE,msg)
-            if res is not None:
-                api.chatroom.send_redpacket(RPSRedPacket('剪刀石头布!', res.group(2), res.group(1)))
+            if msg.startswith('#rp-rps-limit'):
+                try:
+                    limit = msg.split(' ')[1]
+                    GLOBAL_CONFIG.redpacket_config.rps_limit = int(limit)
+                    print(f'猜拳红包限制设置{limit}成功')
+                except Exception:
+                    print('非法红包指令')
             else:
-                print('非法红包指令')
+                res = re.fullmatch(RP_RPS_CODE_RE,msg)
+                if res is not None:
+                    api.chatroom.send_redpacket(RPSRedPacket('剪刀石头布!', res.group(2), res.group(1)))
+                else:
+                    print('非法红包指令')
         elif msg.startswith('#rp-time'):
             res = re.fullmatch(RP_TIME_CODE_RE,msg)
             if res is not None:

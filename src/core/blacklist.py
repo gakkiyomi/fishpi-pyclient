@@ -1,5 +1,4 @@
 
-import os
 import re
 from src.api import FishPi
 from .config import GLOBAL_CONFIG
@@ -7,7 +6,7 @@ from .config import GLOBAL_CONFIG
 
 def unban_someone(api: FishPi, username):
     if not GLOBAL_CONFIG.chat_config.blacklist.__contains__(username):
-        print(username + '不在小黑屋中')
+        print(f'{username}不在小黑屋中')
         return
     user_info = api.user.get_user_info(username)
     if user_info is None:
@@ -32,13 +31,13 @@ def unban_someone(api: FishPi, username):
 
 def ban_someone(api: FishPi, username):
     if GLOBAL_CONFIG.chat_config.blacklist.__contains__(username):
-        print(username + ' 已在小黑屋中')
+        print(f'{username}已在小黑屋中')
         return
     user_info = api.user.get_user_info(username)
     if user_info is None:
         return
     GLOBAL_CONFIG.chat_config.blacklist.append(username)
-    print(username + '已加入到小黑屋中')
+    print(f'{username}已加入到小黑屋中')
     if GLOBAL_CONFIG.cfg_path is None:
         return
     # 持久化到文件

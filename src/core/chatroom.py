@@ -41,13 +41,13 @@ def listener(api: FishPi, message :dict) -> None:
                     and GLOBAL_CONFIG.chat_config.blacklist.__contains__(user):
                 return
             if user == GLOBAL_CONFIG.auth_config.username:
-                print('\t\t\t\t\t\t[' + time + ']')
-                print('\t\t\t\t\t\t你说: ' + message['md'])
+                print(f'\t\t\t\t\t\t[{time}]')
+                print(f'\t\t\t\t\t\t你说: {message["md"]}')
             else:
                 if 'client' in message:
-                    print('[' + time + '] 来自(' + message['client']+')')
+                    print(f'[{time}] 来自({message["client"]})')
                 else:
-                    print('[' + time + ']')
+                    print(f'[{time}]')
                 if len(user_nick_name) >0:
                     print(f'{user_nick_name}({user})说:')
                 else:

@@ -42,5 +42,3 @@ class RPSRedPacket(RedPacket):
         json_data = super().__json__()
         json_data['gesture'] = self.gesture
         return json_data
-        
-        
