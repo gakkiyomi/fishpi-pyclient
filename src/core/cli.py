@@ -12,27 +12,27 @@ def __send_redpacket_handler(api :FishPi, msg :str):
         if  msg == "#rp":
                api.chatroom.send_redpacket()
         elif msg == "#rp-ave":
-               api.chatroom.send_redpacket(RedPacket('人人有份!', 32, 5, RedPacketType.AVERAGE))
+               api.chatroom.send_redpacket(RedPacket('不要抢,人人有份!', 32, 5, RedPacketType.AVERAGE))
         elif msg == "#rp-hb":
-               api.chatroom.send_redpacket(RedPacket('慎点!', 32, 5, RedPacketType.HEARTBEAT))
+               api.chatroom.send_redpacket(RedPacket('玩的就是心跳!', 32, 5, RedPacketType.HEARTBEAT))
         elif msg == "#rp-rps":
                api.chatroom.send_redpacket(RPSRedPacket('剪刀石头布!', 32, 0))
         elif msg.startswith('#rp-to'):
             res = re.fullmatch(RP_SEND_TO_CODE_RE, msg)
             if res is not None:
-                api.chatroom.send_redpacket(SpecifyRedPacket('给你!', res.group(1), res.group(2).replace('，',',').split(",")))
+                api.chatroom.send_redpacket(SpecifyRedPacket('听我说谢谢你,因为有你,温暖了四季!', res.group(1), res.group(2).replace('，',',').split(",")))
             else:
                 print('非法红包指令')               
         elif msg.startswith('#rp-ave'):
             res = re.fullmatch(RP_AVER_CODE_RE,msg)
             if res is not None:
-                api.chatroom.send_redpacket(RedPacket('人人有份!', res.group(2), res.group(1), RedPacketType.AVERAGE))
+                api.chatroom.send_redpacket(RedPacket('不要抢,人人有份!', res.group(2), res.group(1), RedPacketType.AVERAGE))
             else:
                 print('非法红包指令')       
         elif msg.startswith('#rp-hb'):
             res = re.fullmatch(RP_HB_CODE_RE,msg)
             if res is not None:
-                api.chatroom.send_redpacket(RedPacket('人人有份!', res.group(2), res.group(1), RedPacketType.HEARTBEAT))
+                api.chatroom.send_redpacket(RedPacket('玩的就是心跳!', res.group(2), res.group(1), RedPacketType.HEARTBEAT))
             else:
                 print('非法红包指令')
         elif msg.startswith('#rp-rps'):
