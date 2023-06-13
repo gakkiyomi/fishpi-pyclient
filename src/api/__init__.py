@@ -50,5 +50,14 @@ class FishPi(Base):
             print(f"登陆失败: {rsp['msg']}")
             sys.exit(1)
 
+    def get_breezemoons(self, page:int = 1,size :int = 10) -> dict | None:
+        res = requests.get(f'{HOST}/api/breezemoons?p={page}&size={size}', headers={'User-Agent': UA})
+        print(res.text)
+        response = json.loads(res.text)
+        if 'code' in response and response['code'] == 0:
+            return response['breezemoons']
+        else:
+            print(response['msg'])
+            return None
 
 API = FishPi()

@@ -49,6 +49,15 @@ class User(Base):
          else:
              print(response['msg'])
 
+    def get_breezemoons(self, username :str, page:int = 1, size :int = 10) -> dict | None:
+        resp = requests.get(f'{HOST}/api/user/{username}/breezemoons?p={page}&size={size}&apiKey={self.api_key}', headers={'User-Agent': UA})
+        response = json.loads(resp.text)
+        if 'code' in response and response['code'] == 0:
+            return response['data']['breezemoons']
+        else:
+            print(response['msg'])
+            return None
+
     def checked_status(self) -> dict:
         resp = requests.get(f'{HOST}/user/checkedIn?apiKey={self.api_key}', headers={'User-Agent': UA})
         return json.loads(resp.text)

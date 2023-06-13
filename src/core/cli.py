@@ -88,6 +88,8 @@ def cli_handler(api: FishPi):
                init_chatroom(api)
         elif msg.startswith('#bm'):
             api.user.send_breezemoon(msg[msg.find(' ')+1:len(msg)])
+        elif msg == '#api-key':
+            print(api.api_key)
         elif msg.startswith('#transfer'):
             res = re.fullmatch(TRANSFER_RE, msg)
             if res is not None:
