@@ -20,7 +20,7 @@ DESCRIPTION = '摸鱼派聊天室python客户端'
 URL = 'https://github.com/gakkiyomi/pwl-chat-python'
 EMAIL = 'gakkiyomi@gmail.com'
 AUTHOR = 'gakkiyomi'
-REQUIRES_PYTHON = '>=3.10.8'
+REQUIRES_PYTHON = '>=3.9'
 VERSION = __version__
 
 # What packages are required for this module to be executed?
