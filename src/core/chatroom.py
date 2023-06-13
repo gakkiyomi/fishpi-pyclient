@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import random
 import schedule
+from concurrent.futures import ThreadPoolExecutor
 from src.api import FishPi
 from .config import GLOBAL_CONFIG
 from .redpacket import rush_redpacket
@@ -29,10 +30,13 @@ def soliloquize(api: FishPi) -> None:
     index = random.randint(0, length - 1)
     api.chatroom.send(GLOBAL_CONFIG.chat_config.sentences[index])
 
+executor = ThreadPoolExecutor(max_workers=5)
+
 def listener(api: FishPi, message :dict) -> None:
     if message['type'] == 'msg':
         if message['content'].find("redPacket") != -1:
-            rush_redpacket(api, message)
+            executor.submit(rush_redpacket, api, message)
+            #rush_redpacket(api, message)
         else:
             time = message['time']
             user = message['userName']
