@@ -36,7 +36,6 @@ def listener(api: FishPi, message :dict) -> None:
     if message['type'] == 'msg':
         if message['content'].find("redPacket") != -1:
             executor.submit(rush_redpacket, api, message)
-            #rush_redpacket(api, message)
         else:
             time = message['time']
             user = message['userName']

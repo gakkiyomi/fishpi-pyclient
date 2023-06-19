@@ -50,15 +50,16 @@ def open_rock_paper_scissors_packet(api: FishPi, red_packet_id) -> None:
 
 def rush_redpacket(api: FishPi, redpacket):
     sender = redpacket['userName']
+    content = json.loads(redpacket['content'])
     if sender == api.current_user:
         print('\t\t\t\t\t\t[' + redpacket['time'] + ']')
         print('\t\t\t\t\t\t发送了一个红包')
+        if content['type'] not in ['rockPaperScissors','heartbeat']:
+            open_red_packet(api, redpacket['oId'])
         return
     if (GLOBAL_CONFIG.redpacket_config.red_packet_switch == False):
         print(f'红包助手: {sender}发送了一个红包 你错过了这个红包，请开启抢红包模式！')
         return
-    sender = redpacket['userName']
-    content = json.loads(redpacket['content'])
     if content['type'] == 'heartbeat':
         if GLOBAL_CONFIG.redpacket_config.heartbeat:
             if GLOBAL_CONFIG.redpacket_config.smart_mode:
