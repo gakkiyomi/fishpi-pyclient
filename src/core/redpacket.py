@@ -47,6 +47,16 @@ def open_rock_paper_scissors_packet(api: FishPi, red_packet_id) -> None:
     elif code == CODE.ZERO:
         api.chatroom.send(RPS_ZERO)
 
+def render_redpacket(api: FishPi, message :dict) -> None:
+    if message['type'] != 'redPacketStatus':
+        return
+    sender = message['whoGive']
+    goter = message['whoGot']
+    if sender == api.current_user:
+        if goter != sender:
+            print(f"红包助手: {goter} 领取了你的红包!")
+    else:
+        return
 
 def rush_redpacket(api: FishPi, redpacket):
     sender = redpacket['userName']

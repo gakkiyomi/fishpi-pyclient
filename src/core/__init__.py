@@ -2,6 +2,7 @@ import json
 
 from src.api import FishPi
 from .chatroom import init_soliloquize, listener
+from .redpacket import render_redpacket
 from .config import GLOBAL_CONFIG, RedPacketConfig, AuthConfig, ChatConfig
 import configparser
 import os
@@ -31,6 +32,7 @@ def __init__(api: FishPi, file_path: str = None):
 
 def __init_message_listener(api :FishPi):
     api.add_listener(listener)
+    api.add_listener(render_redpacket)
 
 def __init_default_config():
     print("加载默认配置文件")
