@@ -11,17 +11,16 @@ CODE = enum.Enum('REDPACKET_CODE', ['SUCCESS', 'LOSED', 'NOT_ME', "ZERO"])
 def __open_redpacket_render(username, redpacket: dict) -> CODE:
     who = redpacket['who']
     sender = redpacket['info']['userName']
-    for i in who:
-        if i['userName'] == username:
-            if i['userMoney'] < 0:
-                print(f"红包助手: 悲剧，你竟然被{sender}反向抢了红包({str(i['userMoney'])})积分!")
-                return CODE.LOSED
-            elif i['userMoney'] == 0:
-                print(f"红包助手: 零溢事件，{sender}的红包抢到了({str(i['userMoney'])})积分!")
-                return CODE.ZERO
-            else:
-                print(f"红包助手: 恭喜，你抢到了{sender}的红包({str(i['userMoney'])})积分!")
-                return CODE.SUCCESS
+    for i in (user for user in who if user['userName'] == username):
+        if i['userMoney'] < 0:
+            print(f"红包助手: 悲剧，你竟然被{sender}反向抢了红包({str(i['userMoney'])})积分!")
+            return CODE.LOSED
+        elif i['userMoney'] == 0:
+            print(f"红包助手: 零溢事件，{sender}的红包抢到了({str(i['userMoney'])})积分!")
+            return CODE.ZERO
+        else:
+            print(f"红包助手: 恭喜，你抢到了{sender}的红包({str(i['userMoney'])})积分!")
+            return CODE.SUCCESS
     print(f"红包助手: 遗憾 {sender}的红包没有抢到，比别人慢了一点点，建议换宽带!")
     return CODE.NOT_ME
 
@@ -116,10 +115,9 @@ def __analyze(api: FishPi, packet, red_packet_id, ctime, sender):
         return
 
     probability = 1 / (count - got)
-    for get in packet['who']:
-        if get['userMoney'] > 0:
-            print('红包助手: '+sender+' 发送的心跳红包已无效，智能跳坑！')
-            return
+    for _ in (x for x in packet['who'] if x['userMoney'] > 0):
+        print('红包助手: '+sender+' 发送的心跳红包已无效，智能跳坑！')
+        return
     print(f'红包助手: 此心跳红包的中奖概率为:{str(probability)}')
     if probability >= GLOBAL_CONFIG.redpacket_config.threshold:
         open_red_packet(api, red_packet_id)
