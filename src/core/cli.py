@@ -8,7 +8,7 @@ from src.utils.utils import *
 
 
 
-def __send_redpacket_handler(api :FishPi, msg :str):
+def __send_redpacket_handler(api :FishPi, msg :str) -> None:
         if  msg == "#rp":
                api.chatroom.send_redpacket()
         elif msg == "#rp-ave":
@@ -66,7 +66,7 @@ def __send_redpacket_handler(api :FishPi, msg :str):
                     
 
 
-def cli_handler(api: FishPi):
+def cli_handler(api: FishPi) -> None:
     while True:
         msg = input("")
         if msg == '#help':

@@ -4,7 +4,7 @@ from src.api import FishPi
 from .config import GLOBAL_CONFIG
 
 
-def unban_someone(api: FishPi, username):
+def unban_someone(api: FishPi, username) -> None:
     if not GLOBAL_CONFIG.chat_config.blacklist.__contains__(username):
         print(f'{username}不在小黑屋中')
         return
@@ -29,7 +29,7 @@ def unban_someone(api: FishPi, username):
     dst.close()
 
 
-def ban_someone(api: FishPi, username):
+def ban_someone(api: FishPi, username) -> None:
     if GLOBAL_CONFIG.chat_config.blacklist.__contains__(username):
         print(f'{username}已在小黑屋中')
         return
