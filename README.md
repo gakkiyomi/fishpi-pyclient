@@ -75,3 +75,9 @@ python core.py
 ![redpacket](https://file.fishpi.cn/2023/06/image-d0ad7756.png)
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-f74aae7e.png)
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-1b685256.png)
+
+## 🔑 JetBrains OS licenses
+
+`pwl-chat-ptyhon` had been being developed with `PyCharm IDE` under the free JetBrains Open Source license(s) granted by JetBrains s.r.o., hence I would like to express my thanks here.
+
+<a href="https://www.jetbrains.com/?from=pwl-chat-ptyhon" target="_blank"><img src="https://b3logfile.com/file/2021/05/jetbrains-variant-2-42d96aa4.png" width="250" align="middle"/></a>
