@@ -1,8 +1,10 @@
-
+# -*- coding: utf-8 -*-
 
 import time
+
 from src.api import FishPi
 from src.utils.utils import *
+
 from .config import GLOBAL_CONFIG
 
 
@@ -26,11 +28,13 @@ def render_online_users(api: FishPi):
         print('用户: ' + user['userName'])
         print('----------------------')
 
-def auto_check_in(api: FishPi):
+
+def check_in(api: FishPi):
     if len(api.api_key) == 0:
         print('未登录')
     else:
         api.user.get_yesterday_reward()
+
 
 def login(api: FishPi):
     success = api.login(GLOBAL_CONFIG.auth_config.username,
@@ -39,6 +43,8 @@ def login(api: FishPi):
         print(HELP)
     else:
         while len(api.api_key) == 0:
-            time.sleep(3)
+            code = input("")
+            api.login(GLOBAL_CONFIG.auth_config.username,
+                      GLOBAL_CONFIG.auth_config.password, code)
             if len(api.api_key) > 0:
                 break

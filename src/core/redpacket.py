@@ -1,8 +1,12 @@
-from src.api import FishPi
+# -*- coding: utf-8 -*-
+
+import enum
 import json
 import time
-import enum
-from src.utils.utils import RPS_LOSED, RPS_ZERO, RPS_SUCCESS
+
+from src.api import FishPi
+from src.utils.utils import RPS_LOSED, RPS_SUCCESS, RPS_ZERO
+
 from .config import GLOBAL_CONFIG
 
 CODE = enum.Enum('REDPACKET_CODE', ['SUCCESS', 'LOSED', 'NOT_ME', "ZERO"])
@@ -46,7 +50,8 @@ def open_rock_paper_scissors_packet(api: FishPi, red_packet_id) -> None:
     elif code == CODE.ZERO:
         api.chatroom.send(RPS_ZERO)
 
-def render_redpacket(api: FishPi, message :dict) -> None:
+
+def render_redpacket(api: FishPi, message: dict) -> None:
     if message['type'] != 'redPacketStatus':
         return
     sender = message['whoGive']
@@ -57,13 +62,14 @@ def render_redpacket(api: FishPi, message :dict) -> None:
     else:
         return
 
+
 def rush_redpacket(api: FishPi, redpacket):
     sender = redpacket['userName']
     content = json.loads(redpacket['content'])
     if sender == api.current_user:
         print('\t\t\t\t\t\t[' + redpacket['time'] + ']')
         print('\t\t\t\t\t\t发送了一个红包')
-        if content['type'] not in ['rockPaperScissors','heartbeat']:
+        if content['type'] not in ['rockPaperScissors', 'heartbeat']:
             open_red_packet(api, redpacket['oId'])
         return
     if (GLOBAL_CONFIG.redpacket_config.red_packet_switch == False):
@@ -100,10 +106,11 @@ def __analyzeHeartbeatRedPacket(api: FishPi, red_packet_id):
     for data in api.chatroom.more()['data']:
         if data['oId'] == red_packet_id:
             if data['content']:
-                __analyze(api, json.loads(data['content']), red_packet_id, data['time'], data['userName'])
+                __analyze(api, json.loads(
+                    data['content']), red_packet_id, data['time'], data['userName'])
             else:
                 return
-        return    
+        return
     print("红包助手: 你与此红包无缘")
 
 

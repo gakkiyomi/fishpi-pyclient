@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from .chatroom import ChatRoom
-from src.utils.utils import UA, HOST
-from .__api__ import Base
-from .user import User
-import sys
-import requests
 import hashlib
 import json
+import sys
+
+import requests
+
+from src.utils.utils import HOST, UA
+
+from .__api__ import Base
+from .chatroom import ChatRoom
+from .user import User
 
 
 class FishPi(Base):
@@ -36,7 +39,8 @@ class FishPi(Base):
             'userPassword': hashlib.md5(str(password).encode('utf-8')).hexdigest(),
             'mfaCode': mfa_code
         }
-        res = requests.post(f"{HOST}/api/getKey", json=params, headers={'User-Agent': UA})
+        res = requests.post(f"{HOST}/api/getKey",
+                            json=params, headers={'User-Agent': UA})
         rsp = json.loads(res.text)
         if rsp['code'] == 0:
             self.set_token(rsp['Key'])
@@ -50,8 +54,9 @@ class FishPi(Base):
             print(f"登陆失败: {rsp['msg']}")
             sys.exit(1)
 
-    def get_breezemoons(self, page:int = 1,size :int = 10) -> dict | None:
-        res = requests.get(f'{HOST}/api/breezemoons?p={page}&size={size}', headers={'User-Agent': UA})
+    def get_breezemoons(self, page: int = 1, size: int = 10) -> dict | None:
+        res = requests.get(
+            f'{HOST}/api/breezemoons?p={page}&size={size}', headers={'User-Agent': UA})
         print(res.text)
         response = json.loads(res.text)
         if 'code' in response and response['code'] == 0:
@@ -59,5 +64,6 @@ class FishPi(Base):
         else:
             print(response['msg'])
             return None
+
 
 API = FishPi()

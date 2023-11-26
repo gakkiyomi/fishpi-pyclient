@@ -1,10 +1,14 @@
-import requests
+# -*- coding: utf-8 -*-
 import json
 import random
-from .redpacket import *
-from src.utils.utils import UA, HOST
+
+import requests
+
+from src.utils.utils import HOST, UA
 from src.utils.version import __version__
+
 from .__api__ import Base
+from .redpacket import *
 
 
 class ChatRoom(Base):
@@ -21,22 +25,23 @@ class ChatRoom(Base):
             return None
         params = {'apiKey': self.api_key, 'content': message,
                   'client': f'Python/客户端v{__version__}'}
-        ret = requests.post(f'{HOST}/chat-room/send', json=params, headers={'User-Agent': UA})
+        ret = requests.post(f'{HOST}/chat-room/send',
+                            json=params, headers={'User-Agent': UA})
         ret_json = json.loads(ret.text)
         if ('code' in ret_json and ret_json['code'] == -1):
             print(ret_json['msg'])
-            
 
-    def send_redpacket(self, redpacket :RedPacket=RedPacket('最后的发', 128, 5,RedPacketType.RANDOM)):
+    def send_redpacket(self, redpacket: RedPacket = RedPacket('最后的发', 128, 5, RedPacketType.RANDOM)):
         content = f'[redpacket]{json.dumps(redpacket.__json__())}[/redpacket]'
-        self.send(content)        
+        self.send(content)
 
     def open_redpacket(self, red_packet_id) -> dict:
         params = {
             'apiKey': self.api_key,
             'oId': red_packet_id
         }
-        resp = requests.post(f"{HOST}/chat-room/red-packet/open", json=params, headers={'User-Agent': UA})
+        resp = requests.post(
+            f"{HOST}/chat-room/red-packet/open", json=params, headers={'User-Agent': UA})
         return json.loads(resp.text)
 
     def open_rock_paper_scissors_redpacket(self, red_packet_id, gesture: int = -1) -> dict:
@@ -47,5 +52,6 @@ class ChatRoom(Base):
             'oId': red_packet_id,
             'gesture': gesture
         }
-        resp = requests.post(f"{HOST}/chat-room/red-packet/open", json=params, headers={'User-Agent': UA})
+        resp = requests.post(
+            f"{HOST}/chat-room/red-packet/open", json=params, headers={'User-Agent': UA})
         return json.loads(resp.text)

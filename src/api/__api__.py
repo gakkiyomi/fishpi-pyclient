@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 
 class Response:
     def __init__(self, code: int = 0, msg: str = '', data: any = {}):
