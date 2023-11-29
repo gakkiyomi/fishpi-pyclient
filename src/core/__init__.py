@@ -38,6 +38,7 @@ def __init_message_listener(api: FishPi):
     api.add_listener(render_redpacket)
 
 
+
 def __init_default_config(cli_config: CliConfig):
     print("加载系统变量")
     GLOBAL_CONFIG.auth_config = AuthConfig()
@@ -46,6 +47,7 @@ def __init_default_config(cli_config: CliConfig):
     GLOBAL_CONFIG.cfg_path = None
     __init_userinfo_with_sys_env(GLOBAL_CONFIG.auth_config)
     __init_userinfo_with_cli_config(GLOBAL_CONFIG.auth_config, cli_config)
+
 
 
 def __int_redpacket_config(config: ConfigParser) -> RedPacketConfig:
@@ -74,6 +76,7 @@ def __int_redpacket_config(config: ConfigParser) -> RedPacketConfig:
 def __init_login_auth_config(config: ConfigParser, cli_config: CliConfig) -> AuthConfig:
     auth_config = AuthConfig(config.get('auth', 'username'),
                              config.get('auth', 'password'))
+
     __init_userinfo_with_sys_env(auth_config)
     __init_userinfo_with_cli_config(auth_config, cli_config)
     return auth_config
@@ -86,11 +89,14 @@ def __init_userinfo_with_sys_env(auth_config: AuthConfig):
         "FISH_PI_PASSWORD", auth_config.password)
 
 
+
 def __init_userinfo_with_cli_config(auth_config: AuthConfig, cli_config: CliConfig):
     if cli_config.username is not None and cli_config.password is not None:
         auth_config.username = cli_config.username
         auth_config.password = cli_config.password
         auth_config.mfa_code = cli_config.code
+    return auth_config
+
 
 
 def __init_chat_config(config: ConfigParser) -> ChatConfig:
