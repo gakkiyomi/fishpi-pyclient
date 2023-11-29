@@ -2,20 +2,13 @@
 import click
 
 from src.api import API
-from src.core import init_config
-from src.core.command import init_cli
+from src.core import FishPiInitor
 from src.core.config import CliConfig
-from src.core.user import check_in, login
-from src.core.websocket import init_chatroom
 from src.utils.version import __version__
 
 
 def run(config: CliConfig):
-    init_config(API, config)
-    login(API)
-    check_in(API)
-    init_chatroom(API)
-    init_cli((API))
+    FishPiInitor(api=API, cli_config=config)
 
 
 @click.command()
