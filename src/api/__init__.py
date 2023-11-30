@@ -52,7 +52,7 @@ class FishPi(Base):
             return False
         else:
             print(f"登陆失败: {rsp['msg']}")
-            sys.exit(1)
+            sys.exit()
 
     def get_breezemoons(self, page: int = 1, size: int = 10) -> dict | None:
         res = requests.get(
