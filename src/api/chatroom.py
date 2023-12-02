@@ -13,6 +13,9 @@ from .redpacket import *
 
 class ChatRoom(Base):
 
+    def __init__(self, last_msg_id=None):
+        self.last_msg_id = last_msg_id
+
     def more(self, page: int = 1) -> None | dict:
         if self.api_key == '':
             return None
@@ -20,7 +23,7 @@ class ChatRoom(Base):
                             headers={'User-Agent': UA})
         return json.loads(resp.text)
 
-    def send(self, message: str) -> dict | None:
+    def send(self, message: str) -> None:
         if self.api_key == '':
             return None
         params = {'apiKey': self.api_key, 'content': message,
@@ -31,7 +34,20 @@ class ChatRoom(Base):
         if ('code' in ret_json and ret_json['code'] == -1):
             print(ret_json['msg'])
 
-    def send_redpacket(self, redpacket: RedPacket = RedPacket('最后的发', 128, 5, RedPacketType.RANDOM)):
+    def revoke(self, msg_id: str) -> None:
+        if self.api_key == '':
+            return None
+        params = {'apiKey': self.api_key,
+                  'client': f'Python/客户端v{__version__}'}
+        ret = requests.delete(f'{HOST}/chat-room/revoke/{msg_id}',
+                              json=params, headers={'User-Agent': UA})
+        ret_json = json.loads(ret.text)
+        if ('code' in ret_json and ret_json['code'] == -1):
+            print(ret_json["msg"])
+        else:
+            print('撤回成功')
+
+    def send_redpacket(self, redpacket: RedPacket = RedPacket('最后的发', 128, 5, RedPacketType.RANDOM)) -> None:
         content = f'[redpacket]{json.dumps(redpacket.__json__())}[/redpacket]'
         self.send(content)
 

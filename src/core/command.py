@@ -106,7 +106,13 @@ class GetRewardCommand(Command):
 class GetPointCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         print(
-            "当前积分: " + str(api.user.get_user_info(GLOBAL_CONFIG.auth_config.username)["userPoint"]))
+            f'当前积分: {str(api.user.get_user_info(GLOBAL_CONFIG.auth_config.username)["userPoint"])}')
+
+
+class RevokeMessageCommand(Command):
+    def exec(self, api: FishPi, args: Tuple[str, ...]):
+        if api.chatroom.last_msg_id is not None:
+            api.chatroom.revoke(api.chatroom.last_msg_id)
 
 
 class BlackListCommand(Command):
@@ -261,6 +267,7 @@ def init_cli(api: FishPi):
     cli_handler.add_command('#answer', AnswerMode())
     cli_handler.add_command('#checked', CheckInCommand())
     cli_handler.add_command('#reward', GetRewardCommand())
+    cli_handler.add_command('#revoke', RevokeMessageCommand())
     cli_handler.add_command('#liveness', GetLivenessCommand())
     cli_handler.add_command('#point', GetPointCommand())
     cli_handler.add_command('#user', GetUserInfoCommand())

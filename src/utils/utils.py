@@ -22,6 +22,7 @@ COMMAND_GUIDE = '''
 [#answer] 进入|退出 答题模式
 [#checked] 查看当前是否签到
 [#reward] 领取昨日活跃奖励
+[#revoke] 撤回最近一条聊天室消息
 [#transfer] 32 Gakkiyomi 送给你 (积分 用户 留言)
 [#point] 查看当前个人积分
 [#online-users] 查看当前在线的用户列表
