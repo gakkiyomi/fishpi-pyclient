@@ -11,7 +11,7 @@ from src.core.user import check_in, login
 from src.core.websocket import init_chatroom
 
 from .chatroom import init_soliloquize, listener
-from .config import GLOBAL_CONFIG, AuthConfig, ChatConfig, CliConfig, RedPacketConfig
+from .config import GLOBAL_CONFIG, AuthConfig, ChatConfig, CliOptions, RedPacketConfig
 from .redpacket import render_redpacket
 
 
@@ -26,17 +26,17 @@ class Initor(ABC):
             node = node.next
 
     @abstractmethod
-    def exec(self, api: FishPi, cli_config: CliConfig) -> None:
+    def exec(self, api: FishPi, options: CliOptions) -> None:
         pass
 
-    def init(self, api: FishPi, cli_config: CliConfig) -> None:
-        self.exec(api, cli_config)
-        self.next.init(api, cli_config)
+    def init(self, api: FishPi, options: CliOptions) -> None:
+        self.exec(api, options)
+        self.next.init(api, options)
 
 
 class FileConfigInitor(Initor):
-    def exec(self, api: FishPi, cli_config: CliConfig) -> None:
-        file_path = cli_config.file_path
+    def exec(self, api: FishPi, options: CliOptions) -> None:
+        file_path = options.file_path
         if file_path is None:
             file_path = f'{os.getcwd()}/config.ini'
         config = ConfigParser()
@@ -55,7 +55,7 @@ class FileConfigInitor(Initor):
 
 
 class DefualtConfigInitor(Initor):
-    def exec(self, api: FishPi, cli_config: CliConfig) -> None:
+    def exec(self, api: FishPi, options: CliOptions) -> None:
         print("生成默认配置")
         GLOBAL_CONFIG.auth_config = AuthConfig()
         GLOBAL_CONFIG.redpacket_config = RedPacketConfig()
@@ -64,7 +64,7 @@ class DefualtConfigInitor(Initor):
 
 
 class EnvConfigInitor(Initor):
-    def exec(self, api: FishPi, cli_config: CliConfig) -> None:
+    def exec(self, api: FishPi, options: CliOptions) -> None:
         GLOBAL_CONFIG.auth_config.username = os.environ.get(
             "FISH_PI_USERNAME", '')
         GLOBAL_CONFIG. auth_config.password = os.environ.get(
@@ -72,12 +72,12 @@ class EnvConfigInitor(Initor):
 
 
 class CilConfigInitor(Initor):
-    def exec(self, api: FishPi, cli_config: CliConfig) -> None:
-        init_userinfo_with_cli_config(cli_config)
+    def exec(self, api: FishPi, options: CliOptions) -> None:
+        init_userinfo_with_options(options)
 
 
 class LoginInitor(Initor):
-    def exec(self, api: FishPi, cli_config: CliConfig) -> None:
+    def exec(self, api: FishPi, options: CliOptions) -> None:
         if GLOBAL_CONFIG.auth_config.username is None:
             print('用户名不能为空')
             sys.exit(0)
@@ -89,7 +89,7 @@ class LoginInitor(Initor):
 
 
 class ChaRoomInitor(Initor):
-    def exec(self, api: FishPi, cli_config: CliConfig) -> None:
+    def exec(self, api: FishPi, options: CliOptions) -> None:
         api.add_listener(listener)
         api.add_listener(render_redpacket)
         init_soliloquize(api)
@@ -97,28 +97,28 @@ class ChaRoomInitor(Initor):
 
 
 class CliInitor(Initor):
-    def exec(self, api: FishPi, cli_config: CliConfig) -> None:
+    def exec(self, api: FishPi, options: CliOptions) -> None:
         init_cli(api)
 
 
 class InitChain(object):
-    def __init__(self, api: FishPi = None, cli_config: CliConfig = None) -> None:
+    def __init__(self, api: FishPi = None, options: CliOptions = None) -> None:
         self.head: Initor = None
         self.api = api
-        self.cli_config = cli_config
+        self.options = options
 
     def __call__(self, *args: Any, **kwds: Any) -> None:
         self.api = kwds['api']
-        self.cli_config = kwds['cli_config']
+        self.options = kwds['options']
         self.init()
 
     def append(self, *args) -> None:
         curr_node = self.head
-        sample_generator = (i for i in args)
+        initors = (i for i in args)
         if curr_node is None:
-            self.head = next(sample_generator)
+            self.head = next(initors)
             curr_node = self.head
-        for initor in sample_generator:
+        for initor in initors:
             curr_node.next = initor
             curr_node = curr_node.next
 
@@ -130,7 +130,7 @@ class InitChain(object):
                     LoginInitor(),
                     ChaRoomInitor(),
                     CliInitor())
-        self.head.init(self.api, self.cli_config)
+        self.head.init(self.api, self.options)
 
 
 def int_redpacket_config(config: ConfigParser) -> RedPacketConfig:
@@ -161,11 +161,11 @@ def init_auth_config(config: ConfigParser) -> None:
                                            config.get('auth', 'password'))
 
 
-def init_userinfo_with_cli_config(cli_config: CliConfig) -> None:
-    if cli_config.username is not None and cli_config.password is not None:
-        GLOBAL_CONFIG.auth_config.username = cli_config.username
-        GLOBAL_CONFIG.auth_config.password = cli_config.password
-        GLOBAL_CONFIG.auth_config.mfa_code = cli_config.code
+def init_userinfo_with_options(options: CliOptions) -> None:
+    if options.username is not None and options.password is not None:
+        GLOBAL_CONFIG.auth_config.username = options.username
+        GLOBAL_CONFIG.auth_config.password = options.password
+        GLOBAL_CONFIG.auth_config.mfa_code = options.code
 
 
 def init_chat_config(config: ConfigParser) -> ChatConfig:

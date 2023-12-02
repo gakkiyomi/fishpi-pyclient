@@ -40,7 +40,7 @@ class Config(object):
         self.cfg_path = cfg_path
 
 
-class CliConfig(object):
+class CliOptions(object):
     def __init__(self, username: str = '', password: str = '', code: str = '', file_path: str = None):
         self.username = username
         self.password = password

@@ -3,12 +3,12 @@ import click
 
 from src.api import API
 from src.core import FishPiInitor
-from src.core.config import CliConfig
+from src.core.config import CliOptions
 from src.utils.version import __version__
 
 
-def run(config: CliConfig):
-    FishPiInitor(api=API, cli_config=config)
+def run(options: CliOptions):
+    FishPiInitor(api=API, options=options)
 
 
 @click.command()
@@ -18,7 +18,7 @@ def run(config: CliConfig):
 @click.option("--code", "-c", type=click.STRING, help="两步验证码")
 @click.option("--file_path", "-f", type=click.STRING, help="配置文件路径")
 def cli(username: str, password: str, code: str, file_path: str) -> str:
-    run(CliConfig(username, password, code, file_path))
+    run(CliOptions(username, password, code, file_path))
 
 
 if __name__ == "__main__":
