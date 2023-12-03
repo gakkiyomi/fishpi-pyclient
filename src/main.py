@@ -6,6 +6,7 @@ import click
 import schedule
 
 from src.api import API
+<<<<<<< HEAD
 from src.api.config import CliOptions
 from src.core import FishPiInitor
 from src.utils.version import __version__
@@ -13,6 +14,15 @@ from src.utils.version import __version__
 
 def run(options: CliOptions):
     FishPiInitor(api=API, options=options)
+=======
+from src.core import FishPiInitor
+from src.core.config import CliConfig
+from src.utils.version import __version__
+
+
+def run(config: CliConfig):
+    FishPiInitor(api=API, cli_config=config)
+>>>>>>> origin/master
 
 
 @click.command()
