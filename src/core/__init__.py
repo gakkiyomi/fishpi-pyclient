@@ -8,9 +8,8 @@ from typing import Any
 from src.api import FishPi
 from src.core.command import init_cli
 from src.core.user import check_in, login
-from src.core.websocket import init_chatroom
 
-from .chatroom import init_soliloquize, listener
+from .chatroom import ChatRoom, listener
 from .config import GLOBAL_CONFIG, AuthConfig, ChatConfig, CliOptions, RedPacketConfig
 from .redpacket import render_redpacket
 
@@ -90,10 +89,8 @@ class LoginInitor(Initor):
 
 class ChaRoomInitor(Initor):
     def exec(self, api: FishPi, options: CliOptions) -> None:
-        api.add_listener(listener)
-        api.add_listener(render_redpacket)
-        init_soliloquize(api)
-        init_chatroom(api)
+        chatroom = ChatRoom(ws_calls=[listener, render_redpacket])
+        chatroom.start()
 
 
 class CliInitor(Initor):

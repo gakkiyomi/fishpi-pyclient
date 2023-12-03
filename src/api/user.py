@@ -4,12 +4,11 @@ import json
 
 import requests
 
-from src.utils.utils import HOST, UA
+from src.api import Base
+from src.utils import HOST, UA
 
-from .__api__ import Base
 
-
-class User(Base):
+class UserAPI(Base):
 
     def __init__(self, key='', reward=False):
         super().__init__(key)

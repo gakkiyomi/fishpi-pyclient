@@ -5,7 +5,7 @@ from typing import Tuple
 
 from src.api import FishPi
 from src.api.redpacket import RedPacket, RedPacketType, RPSRedPacket, SpecifyRedPacket
-from src.utils.utils import (
+from src.utils import (
     COMMAND_GUIDE,
     RP_RE,
     RP_SEND_TO_CODE_RE,
@@ -14,9 +14,10 @@ from src.utils.utils import (
 )
 
 from .blacklist import ban_someone, release_someone
+from .chatroom import ChatRoom, listener
 from .config import GLOBAL_CONFIG
+from .redpacket import render_redpacket
 from .user import render_online_users, render_user_info
-from .websocket import chatroom_out, init_chatroom
 
 
 class Command(ABC):
@@ -44,20 +45,24 @@ class DefaultCommand(Command):
 
 class EnterCil(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        if api.ws is None:
-            print("已经进入交互模式了")
+        if len(api.ws) == 0:
+            print("已在交互模式中")
         else:
-            chatroom_out(api)
+            ws_keys = list(api.ws.keys())
+            for k in ws_keys:
+                api.ws[k].stop()
             print("进入交互模式")
 
 
 class EnterChatroom(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        if api.ws is None:
-            init_chatroom(api)
+        if ChatRoom.WS_URL in api.ws:
+            print("已在聊天室中")
         else:
-            chatroom_out(api)
-            init_chatroom(api)
+            cr = ChatRoom(
+                ws_calls=[listener, render_redpacket])
+            api.ws[ChatRoom.WS_URL] = cr
+            cr.start()
 
 
 class AnswerMode(Command):

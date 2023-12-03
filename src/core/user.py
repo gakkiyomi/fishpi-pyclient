@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import time
-
 from src.api import FishPi
-from src.utils.utils import *
+from src.utils import HELP
 
 from .config import GLOBAL_CONFIG
 

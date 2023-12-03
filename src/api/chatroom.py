@@ -4,14 +4,14 @@ import random
 
 import requests
 
-from src.utils.utils import HOST, UA
+from src.api import Base
+from src.utils import HOST, UA
 from src.utils.version import __version__
 
-from .__api__ import Base
 from .redpacket import *
 
 
-class ChatRoom(Base):
+class ChatRoomAPI(Base):
 
     def __init__(self, last_msg_id=None):
         self.last_msg_id = last_msg_id
