@@ -9,7 +9,7 @@ from src.api import API, FishPi
 from src.api.ws import WS
 
 from .config import GLOBAL_CONFIG
-from .redpacket import rush_redpacket
+from .redpacket import render_redpacket, rush_redpacket
 
 REPEAT_POOL = {}  # 复读池
 
@@ -41,7 +41,7 @@ def soliloquize(api: FishPi) -> None:
 executor = ThreadPoolExecutor(max_workers=5)
 
 
-def listener(api: FishPi, message: dict) -> None:
+def render(api: FishPi, message: dict) -> None:
     if message["type"] == "msg":
         if message["content"].find("redPacket") != -1:
             executor.submit(rush_redpacket, api, message)
@@ -78,9 +78,9 @@ def renderChatroomMsg(api: FishPi, message: dict) -> None:
 class ChatRoom(WS):
     WS_URL = 'fishpi.cn/chat-room-channel'
 
-    def __init__(self, ws_calls: list[str] = []) -> None:
+    def __init__(self) -> None:
         init_soliloquize(WS.api)
-        super().__init__(ChatRoom.WS_URL, ws_calls)
+        super().__init__(ChatRoom.WS_URL, [render, render_redpacket])
 
     def on_open(self, obj):
         print(f'欢迎{API.current_user}进入聊天室!')
