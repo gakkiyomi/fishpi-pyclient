@@ -3,8 +3,7 @@
 import re
 
 from src.api import FishPi
-
-from .config import GLOBAL_CONFIG
+from src.api.config import GLOBAL_CONFIG
 
 
 def release_someone(api: FishPi, username: str) -> None:

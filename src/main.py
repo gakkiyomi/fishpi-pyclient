@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
+import signal
+import sys
+
 import click
+import schedule
 
 from src.api import API
+from src.api.config import CliOptions
 from src.core import FishPiInitor
-from src.core.config import CliConfig
 from src.utils.version import __version__
 
 
-def run(config: CliConfig):
-    FishPiInitor(api=API, cli_config=config)
+def run(options: CliOptions):
+    FishPiInitor(api=API, options=options)
 
 
 @click.command()
@@ -18,8 +22,20 @@ def run(config: CliConfig):
 @click.option("--code", "-c", type=click.STRING, help="两步验证码")
 @click.option("--file_path", "-f", type=click.STRING, help="配置文件路径")
 def cli(username: str, password: str, code: str, file_path: str) -> str:
-    run(CliConfig(username, password, code, file_path))
+    run(CliOptions(username, password, code, file_path))
 
+
+def signal_handler(sig, frame):
+    schedule.clear()
+    for user in API.sockpuppets.values():
+        keys = list(user.ws.keys())
+        for key in keys:
+            user.ws[key].stop()
+    print("\n收到 Ctrl+C 信号，程序即将退出...")
+    sys.exit(0)
+
+
+signal.signal(signal.SIGINT, signal_handler)
 
 if __name__ == "__main__":
     cli()

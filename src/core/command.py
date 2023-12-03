@@ -3,9 +3,12 @@ import re
 from abc import ABC, abstractmethod
 from typing import Tuple
 
-from src.api import FishPi
+from objprint import op
+
+from src.api import FishPi, UserInfo
+from src.api.config import GLOBAL_CONFIG
 from src.api.redpacket import RedPacket, RedPacketType, RPSRedPacket, SpecifyRedPacket
-from src.utils.utils import (
+from src.utils import (
     COMMAND_GUIDE,
     RP_RE,
     RP_SEND_TO_CODE_RE,
@@ -14,9 +17,8 @@ from src.utils.utils import (
 )
 
 from .blacklist import ban_someone, release_someone
-from .config import GLOBAL_CONFIG
+from .chatroom import ChatRoom
 from .user import render_online_users, render_user_info
-from .websocket import chatroom_out, init_chatroom
 
 
 class Command(ABC):
@@ -32,7 +34,8 @@ class HelpCommand(Command):
 
 class DefaultCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        if api.ws is not None:
+        curr_user = api.sockpuppets[api.current_user]
+        if curr_user.ws is not None:
             if GLOBAL_CONFIG.chat_config.answer_mode:
                 api.chatroom.send(
                     f"鸽 {' '.join(args)}")
@@ -44,20 +47,25 @@ class DefaultCommand(Command):
 
 class EnterCil(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        if api.ws is None:
-            print("已经进入交互模式了")
+        curr_user = api.sockpuppets[api.current_user]
+        if len(curr_user.ws) == 0:
+            print("已在交互模式中")
         else:
-            chatroom_out(api)
+            keys = list(curr_user.ws.keys())
+            for key in keys:
+                curr_user.ws[key].stop()
             print("进入交互模式")
 
 
 class EnterChatroom(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        if api.ws is None:
-            init_chatroom(api)
+        curr_user = api.sockpuppets[api.current_user]
+        if ChatRoom.WS_URL in curr_user.ws:
+            print("已在聊天室中")
         else:
-            chatroom_out(api)
-            init_chatroom(api)
+            cr = ChatRoom()
+            curr_user.ws[ChatRoom.WS_URL] = cr
+            cr.start()
 
 
 class AnswerMode(Command):
@@ -98,6 +106,13 @@ class GetLivenessCommand(Command):
         print("当前活跃度: " + str(api.user.get_liveness_info()["liveness"]))
 
 
+class BrushLivenessCommand(Command):
+    def exec(self, api: FishPi, args: Tuple[str, ...]):
+        articles = map(lambda article: api.article.get_article(
+            article_id=article['oId']), api.article.list_articles())
+        # TODO
+
+
 class GetRewardCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         api.user.get_yesterday_reward()
@@ -106,7 +121,13 @@ class GetRewardCommand(Command):
 class GetPointCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         print(
-            "当前积分: " + str(api.user.get_user_info(GLOBAL_CONFIG.auth_config.username)["userPoint"]))
+            f'当前积分: {str(api.user.get_user_info(api.current_user)["userPoint"])}')
+
+
+class RevokeMessageCommand(Command):
+    def exec(self, api: FishPi, args: Tuple[str, ...]):
+        if api.chatroom.last_msg_id is not None:
+            api.chatroom.revoke(api.chatroom.last_msg_id)
 
 
 class BlackListCommand(Command):
@@ -129,6 +150,38 @@ class GetUserInfoCommand(Command):
         userInfo = api.user.get_user_info(' '.join(args))
         if userInfo is not None:
             render_user_info(userInfo)
+
+
+class ShowCurrentUserCommand(Command):
+    def exec(self, api: FishPi, args: Tuple[str, ...]):
+        print('当前用户')
+        op(api.sockpuppets[api.current_user], exclude=["ws"])
+
+
+class ShowSockpuppetCommand(Command):
+    def exec(self, api: FishPi, args: Tuple[str, ...]):
+        print('分身账户')
+        for user in api.sockpuppets.values():
+            op(user, exclude=["ws"])
+
+
+class ChangeCurrentUserCommand(Command):
+    def exec(self, api: FishPi, args: Tuple[str, ...]):
+        target_user_name = " ".join(args)
+        print(f'账户切换 {api.current_user} ===> {target_user_name}')
+        api.sockpuppets[api.current_user].offline()
+        if target_user_name in api.sockpuppets:
+            api.sockpuppets[target_user_name].online(ChatRoom().start)
+        else:
+            print('请输入密码:')
+            api_key = ''
+            while len(api_key) == 0:
+                password = input("")
+                api.login(target_user_name, password)
+                api_key = api.api_key
+            api.sockpuppets[target_user_name] = UserInfo(
+                target_user_name, password, api_key)
+            api.sockpuppets[target_user_name].online(ChatRoom().start)
 
 
 class PointTransferCommand(Command):
@@ -261,8 +314,12 @@ def init_cli(api: FishPi):
     cli_handler.add_command('#answer', AnswerMode())
     cli_handler.add_command('#checked', CheckInCommand())
     cli_handler.add_command('#reward', GetRewardCommand())
+    cli_handler.add_command('#revoke', RevokeMessageCommand())
     cli_handler.add_command('#liveness', GetLivenessCommand())
     cli_handler.add_command('#point', GetPointCommand())
+    cli_handler.add_command('#me', ShowCurrentUserCommand())
+    cli_handler.add_command('#account', ShowSockpuppetCommand())
+    cli_handler.add_command('#change', ChangeCurrentUserCommand())
     cli_handler.add_command('#user', GetUserInfoCommand())
     cli_handler.add_command('#online-users', OnlineUserCommand())
     cli_handler.add_command('#blacklist', BlackListCommand())

@@ -17,6 +17,10 @@ class AuthConfig(object):
         self.username = username
         self.password = password
         self.mfa_code = mfa_code
+        self.accounts: list[tuple[str, ...]] = []
+
+    def add_account(self, username='', password=''):
+        self.accounts.append((username, password))
 
 
 class ChatConfig(object):
@@ -40,7 +44,7 @@ class Config(object):
         self.cfg_path = cfg_path
 
 
-class CliConfig(object):
+class CliOptions(object):
     def __init__(self, username: str = '', password: str = '', code: str = '', file_path: str = None):
         self.username = username
         self.password = password

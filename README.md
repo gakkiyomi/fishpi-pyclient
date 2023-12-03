@@ -1,6 +1,6 @@
   ![摸鱼派cn.png](https://b3logfile.com/file/2023/05/摸鱼派-cn-owZQT8f.png)
 
-# pwl-chat-python
+# fishpi-pyclient
 
 > 摸鱼派聊天室 python 命令行客户端
 
@@ -13,13 +13,13 @@
 执行
 
 ```bash
-pip install pwl-chat-python
+pip install fishpi-pyclient
 ```
 
 ## 运行
 
 ```bash
-pwl-chat-python -u username -p password -c <两步验证码>
+fishpi-pyclient -u username -p password -c <两步验证码>
 ```
 
 ## 调试
@@ -32,18 +32,18 @@ python core.py
 
 ## 功能
 
+- 🥷 账号多开
+  - 一键切换
+  - 更多功能请期待
 - 💬 聊天模式
   - 💬 聊天吹水
   - 🤖️ 自动复读
   - 🤖️ 自动领取昨日奖励
+  - 🌛 发送清风明月
+  - 聊天室消息撤回
   - 🧠 自言自语
     - 自定义语句池
     - 定时发送
-  - 🧧 自动化抢红包（脚本哥）
-    - 自定义抢红包延时
-    - 心跳红包防止踩坑
-    - 心跳红包风险预测
-    - ~~猜拳红包百分百胜率~~
 - 命令模式
   - 命令/聊天模式切换
     - (聊天模式也可以执行命令)
@@ -68,9 +68,14 @@ python core.py
       - 猜拳红包
       - 设置抢红包等待时间
       - 抢猜拳红包最大限制
+      - 🧧 自动化抢红包（脚本哥）
+        - 自定义抢红包延时
+        - 心跳红包防止踩坑
+        - 心跳红包风险预测
 
 ## 效果
 
+![fenshen.png](https://file.fishpi.cn/2023/12/账号分身-0a25be81.png)
 ![image.png](https://file.fishpi.cn/2023/06/image-d4da9bf7.png)
 ![redpacket](https://file.fishpi.cn/2023/06/image-d0ad7756.png)
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-f74aae7e.png)

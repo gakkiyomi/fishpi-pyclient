@@ -4,16 +4,14 @@ import json
 
 import requests
 
-from src.utils.utils import HOST, UA
+from src.api import Base
+from src.utils import HOST, UA
 
-from .__api__ import Base
 
+class UserAPI(Base):
 
-class User(Base):
-
-    def __init__(self, key='', reward=False):
-        super().__init__(key)
-        self.reward = reward
+    def __init__(self):
+        self.reward = False
 
     def get_user_info(self, username: str) -> None | dict:
         if self.api_key == '':

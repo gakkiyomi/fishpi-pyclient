@@ -5,9 +5,8 @@ import json
 import time
 
 from src.api import FishPi
-from src.utils.utils import RPS_LOSED, RPS_SUCCESS, RPS_ZERO
-
-from .config import GLOBAL_CONFIG
+from src.api.config import GLOBAL_CONFIG
+from src.utils import RPS_LOSED, RPS_SUCCESS, RPS_ZERO
 
 CODE = enum.Enum('REDPACKET_CODE', ['SUCCESS', 'LOSED', 'NOT_ME', "ZERO"])
 

@@ -22,10 +22,14 @@ COMMAND_GUIDE = '''
 [#answer] 进入|退出 答题模式
 [#checked] 查看当前是否签到
 [#reward] 领取昨日活跃奖励
+[#revoke] 撤回最近一条聊天室消息
 [#transfer] 32 Gakkiyomi 送给你 (积分 用户 留言)
 [#point] 查看当前个人积分
 [#online-users] 查看当前在线的用户列表
 [#user username] 输入 #user 用户名 可查看此用户详细信息 (#user Gakkiyomi)
+[#me] 查看当前在线账号
+[#account] 查看分身账号
+[#change] 账号切换 #change Gakkiyomi
 [#blacklist] 查看黑名单列表
 [#ban username] 将某人送入黑名单
 [#unban username] 将某人解除黑名单
