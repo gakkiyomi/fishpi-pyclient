@@ -1,4 +1,11 @@
-from setuptools import setup
+import io
+import os
+import sys
+from shutil import rmtree
+
+from setuptools import Command, setup
+
+from src.utils.version import __version__
 
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
@@ -6,18 +13,11 @@ from setuptools import setup
 # Note: To use the 'upload' functionality of this file, you must:
 #   $ pipenv install twine --dev
 
-import io
-import os
-import sys
-from shutil import rmtree
-from src.utils.version import __version__
-
-from setuptools import setup, Command
 
 # Package meta-data.
-NAME = 'pwl-chat-python'
+NAME = 'fishpi-pyclient'
 DESCRIPTION = '摸鱼派聊天室python客户端'
-URL = 'https://github.com/gakkiyomi/pwl-chat-python'
+URL = 'https://github.com/gakkiyomi/fishpi-pyclient'
 EMAIL = 'gakkiyomi@gmail.com'
 AUTHOR = 'gakkiyomi'
 REQUIRES_PYTHON = '>=3.9'
@@ -122,7 +122,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'pwl-chat-python = src.main:cli',
+            'fishpi-pyclient = src.main:cli',
         ],
     }
 

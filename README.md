@@ -1,6 +1,6 @@
   ![摸鱼派cn.png](https://b3logfile.com/file/2023/05/摸鱼派-cn-owZQT8f.png)
 
-# pwl-chat-python
+# fishpi-pyclient
 
 > 摸鱼派聊天室 python 命令行客户端
 
@@ -13,13 +13,13 @@
 执行
 
 ```bash
-pip install pwl-chat-python
+pip install fishpi-pyclient
 ```
 
 ## 运行
 
 ```bash
-pwl-chat-python -u username -p password -c <两步验证码>
+fishpi-pyclient -u username -p password -c <两步验证码>
 ```
 
 ## 调试
