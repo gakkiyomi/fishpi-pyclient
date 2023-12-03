@@ -6,8 +6,8 @@ import click
 import schedule
 
 from src.api import API
+from src.api.config import CliOptions
 from src.core import FishPiInitor
-from src.core.config import CliOptions
 from src.utils.version import __version__
 
 
@@ -27,9 +27,10 @@ def cli(username: str, password: str, code: str, file_path: str) -> str:
 
 def signal_handler(sig, frame):
     schedule.clear()
-    ws_kyes = list(API.ws.keys())
-    for key in ws_kyes:
-        API.ws[key].stop()
+    for user in API.sockpuppets.values():
+        keys = list(user.ws.keys())
+        for key in keys:
+            user.ws[key].stop()
     print("\n收到 Ctrl+C 信号，程序即将退出...")
     sys.exit(0)
 

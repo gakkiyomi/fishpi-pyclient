@@ -17,6 +17,10 @@ class AuthConfig(object):
         self.username = username
         self.password = password
         self.mfa_code = mfa_code
+        self.accounts: list[tuple[str, ...]] = []
+
+    def add_account(self, username='', password=''):
+        self.accounts.append((username, password))
 
 
 class ChatConfig(object):

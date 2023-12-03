@@ -10,8 +10,6 @@ from src.api import API
 
 
 class WS(ABC):
-    api = API
-
     def __init__(self, ws_url: str, ws_calls: list[str]) -> None:
         self.ws_url = ws_url
         self.ws_calls = ws_calls
@@ -38,18 +36,18 @@ class WS(ABC):
     def stop(self):
         self.instance.close()
         self.instance = None
-        WS.api.ws.pop(self.ws_url)
+        API.sockpuppets[API.current_user].ws.pop(self.ws_url)
         self.ws_calls = None
         self.ws_url = None
 
 
 def aysnc_start_ws(ws: WS):
     websocket.enableTrace(False)
-    ws_instance = websocket.WebSocketApp(f"wss://{ws.ws_url}?apiKey={WS.api.api_key}",
+    ws_instance = websocket.WebSocketApp(f"wss://{ws.ws_url}?apiKey={API.api_key}",
                                          on_open=ws.on_open,
                                          on_message=ws.on_message,
                                          on_error=ws.on_error,
                                          on_close=ws.on_close)
     ws.instance = ws_instance
-    WS.api.ws[ws.ws_url] = ws
+    API.sockpuppets[API.current_user].ws[ws.ws_url] = ws
     ws_instance.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})

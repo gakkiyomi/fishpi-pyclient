@@ -2,15 +2,23 @@ import json
 import os
 import sys
 from abc import ABC, abstractmethod
-from configparser import ConfigParser
+from configparser import ConfigParser, NoOptionError
 from typing import Any
 
-from src.api import FishPi
-from src.core.command import init_cli
-from src.core.user import check_in, login
+import schedule
 
-from .chatroom import ChatRoom
-from .config import GLOBAL_CONFIG, AuthConfig, ChatConfig, CliOptions, RedPacketConfig
+from src.api import FishPi, UserInfo
+from src.api.config import (
+    GLOBAL_CONFIG,
+    AuthConfig,
+    ChatConfig,
+    CliOptions,
+    RedPacketConfig,
+)
+from src.core.command import init_cli
+from src.core.user import check_in
+
+from .chatroom import ChatRoom, init_soliloquize
 
 
 class Initor(ABC):
@@ -82,12 +90,23 @@ class LoginInitor(Initor):
         if GLOBAL_CONFIG.auth_config.password is None:
             print('密码不能为空')
             sys.exit(0)
-        login(api)
+        api.login(GLOBAL_CONFIG.auth_config.username,
+                  GLOBAL_CONFIG.auth_config.password)
+        if len(GLOBAL_CONFIG.auth_config.accounts) != 0:
+            for account in GLOBAL_CONFIG.auth_config.accounts:
+                api.sockpuppets[account[0]] = UserInfo(
+                    account[0], account[1], '')
+        api.sockpuppets[api.current_user] = UserInfo(
+            api.current_user, GLOBAL_CONFIG.auth_config.password, api.api_key)
+        api.sockpuppets[api.current_user].is_online = True
         check_in(api)
 
 
 class ChaRoomInitor(Initor):
     def exec(self, api: FishPi, options: CliOptions) -> None:
+        init_soliloquize(api)
+        if GLOBAL_CONFIG.chat_config.soliloquize_switch:
+            schedule.run_pending()
         chatroom = ChatRoom()
         chatroom.start()
 
@@ -155,6 +174,17 @@ def int_redpacket_config(config: ConfigParser) -> RedPacketConfig:
 def init_auth_config(config: ConfigParser) -> None:
     GLOBAL_CONFIG.auth_config = AuthConfig(config.get('auth', 'username'),
                                            config.get('auth', 'password'))
+    try:
+        sockpuppet_usernames = config.get(
+            'auth', 'sockpuppet_usernames').replace('，', ',').split(',')
+        sockpuppet_passwords = config.get(
+            'auth', 'sockpuppet_passwords').replace('，', ',').split(',')
+        sockpuppets = zip(sockpuppet_usernames, sockpuppet_passwords)
+        for sockpuppet in sockpuppets:
+            GLOBAL_CONFIG.auth_config.add_account(
+                sockpuppet[0].strip(), sockpuppet[1].strip())
+    except NoOptionError:
+        pass
 
 
 def init_userinfo_with_options(options: CliOptions) -> None:

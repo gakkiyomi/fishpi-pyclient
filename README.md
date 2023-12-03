@@ -32,11 +32,15 @@ python core.py
 
 ## 功能
 
+- 🥷 账号多开
+  - 一键切换
+  - 更多功能请期待
 - 💬 聊天模式
   - 💬 聊天吹水
   - 🤖️ 自动复读
   - 🤖️ 自动领取昨日奖励
   - 🌛 发送清风明月
+  - 聊天室消息撤回
   - 🧠 自言自语
     - 自定义语句池
     - 定时发送
@@ -71,6 +75,7 @@ python core.py
 
 ## 效果
 
+![fenshen.png](https://file.fishpi.cn/2023/12/账号分身-0a25be81.png)
 ![image.png](https://file.fishpi.cn/2023/06/image-d4da9bf7.png)
 ![redpacket](https://file.fishpi.cn/2023/06/image-d0ad7756.png)
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-f74aae7e.png)

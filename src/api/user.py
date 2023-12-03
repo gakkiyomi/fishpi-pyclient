@@ -10,9 +10,8 @@ from src.utils import HOST, UA
 
 class UserAPI(Base):
 
-    def __init__(self, key='', reward=False):
-        super().__init__(key)
-        self.reward = reward
+    def __init__(self):
+        self.reward = False
 
     def get_user_info(self, username: str) -> None | dict:
         if self.api_key == '':

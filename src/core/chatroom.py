@@ -5,9 +5,9 @@ from concurrent.futures import ThreadPoolExecutor
 import schedule
 
 from src.api import API, FishPi
+from src.api.config import GLOBAL_CONFIG
 from src.api.ws import WS
 
-from .config import GLOBAL_CONFIG
 from .redpacket import render_redpacket, rush_redpacket
 
 REPEAT_POOL = {}  # 复读池
@@ -54,7 +54,7 @@ def renderChatroomMsg(api: FishPi, message: dict) -> None:
     user_nick_name = message["userNickname"]
     if len(GLOBAL_CONFIG.chat_config.blacklist) > 0 and GLOBAL_CONFIG.chat_config.blacklist.__contains__(user):
         return
-    if user == GLOBAL_CONFIG.auth_config.username:
+    if user == api.current_user:
         print(f"\t\t\t\t\t\t[{time}]")
         print(f'\t\t\t\t\t\t你说: {message["md"]}')
         api.chatroom.last_msg_id = message['oId']
@@ -78,18 +78,15 @@ class ChatRoom(WS):
     WS_URL = 'fishpi.cn/chat-room-channel'
 
     def __init__(self) -> None:
-        init_soliloquize(WS.api)
         super().__init__(ChatRoom.WS_URL, [render, render_redpacket])
 
     def on_open(self, obj):
         print(f'欢迎{API.current_user}进入聊天室!')
         if len(GLOBAL_CONFIG.chat_config.blacklist) > 0:
             print('小黑屋成员: ' + str(GLOBAL_CONFIG.chat_config.blacklist))
-        if GLOBAL_CONFIG.chat_config.soliloquize_switch:
-            schedule.run_pending()
 
     def on_error(self, obj, error):
         super().on_error(obj, error)
 
     def on_close(self, obj, close_status_code, close_msg):
-        print("已经离开聊天室,可以执行命令 #chatroom 重新进入聊天室")
+        print("已经离开聊天室")

@@ -6,7 +6,7 @@ import sys
 
 import requests
 
-from src.utils import HOST, UA
+from src.utils import HELP, HOST, UA
 
 
 class Base(object):
@@ -20,7 +20,7 @@ class Base(object):
     def set_current_user(self, username):
         self.current_user = username
 
-    def login(self, username: str, password: str, mfa_code='') -> bool:
+    def login(self, username: str, password: str, mfa_code=''):
         params = {
             'nameOrEmail': username,
             'userPassword': hashlib.md5(str(password).encode('utf-8')).hexdigest(),
@@ -33,10 +33,13 @@ class Base(object):
             self.set_token(rsp['Key'])
             self.set_current_user(username)
             print(f'登陆成功! 更多功能与趣味游戏请访问网页端: {HOST}')
-            return True
+            print(HELP)
         elif rsp['code'] == -1 and rsp['msg'] == '两步验证失败，请填写正确的一次性密码':
+            self.set_token('')
             print("请输入两步验证码:")
-            return False
+            while len(self.api_key) == 0:
+                code = input("")
+                self.login(username, password, code)
         else:
             print(f"登陆失败: {rsp['msg']}")
             sys.exit(0)

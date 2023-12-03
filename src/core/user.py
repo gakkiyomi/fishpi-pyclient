@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from src.api import FishPi
-from src.utils import HELP
-
-from .config import GLOBAL_CONFIG
 
 
 def render_user_info(userInfo):
@@ -32,17 +29,3 @@ def check_in(api: FishPi):
         print('未登录')
     else:
         api.user.get_yesterday_reward()
-
-
-def login(api: FishPi):
-    success = api.login(GLOBAL_CONFIG.auth_config.username,
-                        GLOBAL_CONFIG.auth_config.password, GLOBAL_CONFIG.auth_config.mfa_code)
-    if success:
-        print(HELP)
-    else:
-        while len(api.api_key) == 0:
-            code = input("")
-            api.login(GLOBAL_CONFIG.auth_config.username,
-                      GLOBAL_CONFIG.auth_config.password, code)
-            if len(api.api_key) > 0:
-                break

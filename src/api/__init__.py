@@ -12,16 +12,42 @@ from .chatroom import ChatRoomAPI
 from .user import UserAPI
 
 
+class UserInfo(object):
+
+    def __init__(self, username: str, password: str, api_key: str) -> None:
+        self.username = username
+        self.password = password
+        self.api_key = api_key
+        self.ws: dict[str, Any] = {}
+        self.is_online = False
+
+    def online(self, func) -> None:
+        if (len(self.api_key) != 0):
+            API.set_token(self.api_key)
+            API.set_current_user(self.username)
+        else:
+            API.login(self.username, self.password)
+            self.api_key = API.api_key
+        func()
+        self.is_online = True
+
+    def offline(self) -> None:
+        keys = list(self.ws.keys())
+        for key in keys:
+            self.ws[key].stop()
+        self.is_online = False
+
+
 class FishPi(Base):
     def __init__(self):
-        self.ws: dict[str, Any] = {}
+        self.sockpuppets: dict[str, UserInfo] = {}
         self.user = UserAPI()
         self.chatroom = ChatRoomAPI()
         self.article = ArticleAPI()
-        Base.__init__(self)
+        super().__init__(self)
 
     def set_token(self, key):
-        Base.set_token(self, key)
+        super().set_token(key)
         self.user.set_token(key)
         self.chatroom.set_token(key)
         self.article.set_token(key)
