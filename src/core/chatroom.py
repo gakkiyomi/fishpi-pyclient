@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import random
 from concurrent.futures import ThreadPoolExecutor
-from typing import Self
 
 import schedule
 

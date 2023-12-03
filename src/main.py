@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+import signal
+import sys
+
 import click
+import schedule
 
 from src.api import API
 from src.core import FishPiInitor
@@ -20,6 +24,17 @@ def run(options: CliOptions):
 def cli(username: str, password: str, code: str, file_path: str) -> str:
     run(CliOptions(username, password, code, file_path))
 
+
+def signal_handler(sig, frame):
+    schedule.clear()
+    ws_kyes = list(API.ws.keys())
+    for key in ws_kyes:
+        API.ws[key].stop()
+    print("\n收到 Ctrl+C 信号，程序即将退出...")
+    sys.exit(0)
+
+
+signal.signal(signal.SIGINT, signal_handler)
 
 if __name__ == "__main__":
     cli()

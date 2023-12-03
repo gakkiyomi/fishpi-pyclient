@@ -9,9 +9,8 @@ from src.api import FishPi
 from src.core.command import init_cli
 from src.core.user import check_in, login
 
-from .chatroom import ChatRoom, listener
+from .chatroom import ChatRoom
 from .config import GLOBAL_CONFIG, AuthConfig, ChatConfig, CliOptions, RedPacketConfig
-from .redpacket import render_redpacket
 
 
 class Initor(ABC):
@@ -89,7 +88,7 @@ class LoginInitor(Initor):
 
 class ChaRoomInitor(Initor):
     def exec(self, api: FishPi, options: CliOptions) -> None:
-        chatroom = ChatRoom(ws_calls=[listener, render_redpacket])
+        chatroom = ChatRoom()
         chatroom.start()
 
 

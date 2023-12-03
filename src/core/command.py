@@ -14,7 +14,7 @@ from src.utils import (
 )
 
 from .blacklist import ban_someone, release_someone
-from .chatroom import ChatRoom, listener
+from .chatroom import ChatRoom, render
 from .config import GLOBAL_CONFIG
 from .redpacket import render_redpacket
 from .user import render_online_users, render_user_info
@@ -60,7 +60,7 @@ class EnterChatroom(Command):
             print("已在聊天室中")
         else:
             cr = ChatRoom(
-                ws_calls=[listener, render_redpacket])
+                ws_calls=[render, render_redpacket])
             api.ws[ChatRoom.WS_URL] = cr
             cr.start()
 
@@ -101,6 +101,13 @@ class OnlineUserCommand(Command):
 class GetLivenessCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         print("当前活跃度: " + str(api.user.get_liveness_info()["liveness"]))
+
+
+class BrushLivenessCommand(Command):
+    def exec(self, api: FishPi, args: Tuple[str, ...]):
+        articles = map(lambda article: api.article.get_article(
+            article_id=article['oId']), api.article.list_articles())
+        # TODO
 
 
 class GetRewardCommand(Command):
