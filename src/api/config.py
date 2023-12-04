@@ -24,7 +24,7 @@ class AuthConfig(object):
 
 
 class ChatConfig(object):
-    def __init__(self, blacklist=[], repeat_mode_switch=False, frequency=5, soliloquize_switch=False,
+    def __init__(self, blacklist=[], kw_blacklist=[], repeat_mode_switch=False, frequency=5, soliloquize_switch=False,
                  soliloquize_frequency=20, sentences=[], answer_mode: bool = False):
         self.repeat_mode_switch = repeat_mode_switch
         self.frequency = frequency
@@ -33,6 +33,7 @@ class ChatConfig(object):
         self.sentences = ['你们好！', '牵着我的手，闭着眼睛走你也不会迷路。',
                           '吃饭了没有?', '💗 爱你哟！'] + sentences
         self.blacklist = blacklist
+        self.kw_blacklist = kw_blacklist
         self.answer_mode = answer_mode
 
 

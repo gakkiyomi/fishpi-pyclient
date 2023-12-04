@@ -207,6 +207,9 @@ def init_chat_config(config: ConfigParser) -> ChatConfig:
     ret.blacklist = json.loads(config.get('chat', 'blacklist'))
     if ret.blacklist.__contains__(''):
         ret.blacklist.remove('')
+    ret.kw_blacklist = json.loads(config.get('chat', 'kwBlacklist'))
+    if ret.kw_blacklist.__contains__(''):
+        ret.kw_blacklist.remove('')
     return ret
 
 
