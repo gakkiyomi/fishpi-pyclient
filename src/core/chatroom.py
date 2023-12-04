@@ -59,6 +59,11 @@ def renderChatroomMsg(api: FishPi, message: dict) -> None:
         print(f'\t\t\t\t\t\t你说: {message["md"]}')
         api.chatroom.last_msg_id = message['oId']
     else:
+        if len(GLOBAL_CONFIG.chat_config.kw_blacklist) > 0:
+            hasKeyword = any(
+                i for i in GLOBAL_CONFIG.chat_config.kw_blacklist if message["md"].__contains__(i))
+            if hasKeyword:
+                return
         if "client" in message:
             print(f'[{time}] 来自({message["client"]})')
         else:

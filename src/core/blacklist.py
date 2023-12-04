@@ -51,3 +51,43 @@ def ban_someone(api: FishPi, username: str) -> None:
         str(GLOBAL_CONFIG.chat_config.blacklist).replace("\'", "\"")
     dst.write(re.sub(r'blacklist.*', after, config_text))
     dst.close()
+
+
+def put_keyword_to_bl(args: tuple[str, ...]) -> None:
+    for keyword in args:
+        if GLOBAL_CONFIG.chat_config.kw_blacklist.__contains__(keyword):
+            print(f'{keyword} 已在加入关键词屏蔽')
+            continue
+        GLOBAL_CONFIG.chat_config.kw_blacklist.append(keyword)
+        print(f'{keyword} 已在加入关键词屏蔽')
+        if GLOBAL_CONFIG.cfg_path is None:
+            return
+        # 持久化到文件
+        src = open(GLOBAL_CONFIG.cfg_path, "r+")
+        config_text = src.read()
+        src.close()
+        dst = open(GLOBAL_CONFIG.cfg_path, 'w')
+        after = "kwBlacklist=" + \
+            str(GLOBAL_CONFIG.chat_config.kw_blacklist).replace("\'", "\"")
+        dst.write(re.sub(r'kwBlacklist.*', after, config_text))
+        dst.close()
+
+
+def remove_keyword_to_bl(args: tuple[str, ...]) -> None:
+    for keyword in args:
+        if GLOBAL_CONFIG.chat_config.kw_blacklist.__contains__(keyword) == False:
+            print(f'{keyword} 不在关键词屏蔽池中')
+            continue
+        GLOBAL_CONFIG.chat_config.kw_blacklist.remove(keyword)
+        print(f'{keyword} 不再屏蔽')
+        if GLOBAL_CONFIG.cfg_path is None:
+            return
+        # 持久化到文件
+        src = open(GLOBAL_CONFIG.cfg_path, "r+")
+        config_text = src.read()
+        src.close()
+        dst = open(GLOBAL_CONFIG.cfg_path, 'w')
+        after = "kwBlacklist=" + \
+            str(GLOBAL_CONFIG.chat_config.kw_blacklist).replace("\'", "\"")
+        dst.write(re.sub(r'kwBlacklist.*', after, config_text))
+        dst.close()

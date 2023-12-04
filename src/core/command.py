@@ -16,7 +16,12 @@ from src.utils import (
     TRANSFER_RE,
 )
 
-from .blacklist import ban_someone, release_someone
+from .blacklist import (
+    ban_someone,
+    put_keyword_to_bl,
+    release_someone,
+    remove_keyword_to_bl,
+)
 from .chatroom import ChatRoom
 from .user import render_online_users, render_user_info
 
@@ -132,17 +137,32 @@ class RevokeMessageCommand(Command):
 
 class BlackListCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        print(GLOBAL_CONFIG.chat_config.blacklist)
+        print('小黑屋用户:' + str(GLOBAL_CONFIG.chat_config.blacklist))
+        print('关键词屏蔽:' + str(GLOBAL_CONFIG.chat_config.kw_blacklist))
 
 
 class BanSomeoneCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        ban_someone(api, ' '.join(args))
+        it = (i for i in args)
+        ban_type = next(it)
+        if ban_type == 'keyword':
+            put_keyword_to_bl(it)
+        elif ban_type == 'user':
+            ban_someone(api, ' '.join(it))
+        else:
+            print('非法指令, ban指令应该为: ban keyword|user name')
 
 
 class ReleaseSomeoneCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        release_someone(api, ' '.join(args))
+        it = (i for i in args)
+        release_type = next(it)
+        if release_type == 'keyword':
+            remove_keyword_to_bl(it)
+        elif release_type == 'user':
+            release_someone(api, ' '.join(it))
+        else:
+            print('非法指令, release指令应该为: release keyword|user name')
 
 
 class GetUserInfoCommand(Command):

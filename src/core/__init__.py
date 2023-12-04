@@ -84,14 +84,15 @@ class CilConfigInitor(Initor):
 
 class LoginInitor(Initor):
     def exec(self, api: FishPi, options: CliOptions) -> None:
-        if GLOBAL_CONFIG.auth_config.username is None:
-            print('用户名不能为空')
-            sys.exit(0)
-        if GLOBAL_CONFIG.auth_config.password is None:
-            print('密码不能为空')
-            sys.exit(0)
+        while len(GLOBAL_CONFIG.auth_config.username) == 0:
+            print('请输入用户名:')
+            GLOBAL_CONFIG.auth_config.username = input("")
+        while len(GLOBAL_CONFIG.auth_config.password) == 0:
+            print('请输入密码:')
+            GLOBAL_CONFIG.auth_config.password = input("")
         api.login(GLOBAL_CONFIG.auth_config.username,
-                  GLOBAL_CONFIG.auth_config.password)
+                  GLOBAL_CONFIG.auth_config.password,
+                  GLOBAL_CONFIG.auth_config.mfa_code)
         if len(GLOBAL_CONFIG.auth_config.accounts) != 0:
             for account in GLOBAL_CONFIG.auth_config.accounts:
                 api.sockpuppets[account[0]] = UserInfo(
@@ -188,10 +189,11 @@ def init_auth_config(config: ConfigParser) -> None:
 
 
 def init_userinfo_with_options(options: CliOptions) -> None:
-    if options.username is not None and options.password is not None:
+    if options.username is not None:
         GLOBAL_CONFIG.auth_config.username = options.username
+    if options.password is not None:
         GLOBAL_CONFIG.auth_config.password = options.password
-        GLOBAL_CONFIG.auth_config.mfa_code = options.code
+    GLOBAL_CONFIG.auth_config.mfa_code = options.code
 
 
 def init_chat_config(config: ConfigParser) -> ChatConfig:
@@ -205,6 +207,9 @@ def init_chat_config(config: ConfigParser) -> ChatConfig:
     ret.blacklist = json.loads(config.get('chat', 'blacklist'))
     if ret.blacklist.__contains__(''):
         ret.blacklist.remove('')
+    ret.kw_blacklist = json.loads(config.get('chat', 'kwBlacklist'))
+    if ret.kw_blacklist.__contains__(''):
+        ret.kw_blacklist.remove('')
     return ret
 
 
