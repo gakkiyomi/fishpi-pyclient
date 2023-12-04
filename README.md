@@ -8,6 +8,25 @@
 
 ## 安装
 
+### MacOS系统
+
+[v2.0.0下载](https://github.com/gakkiyomi/fishpi-pyclient/releases/download/v2.0.0/fishpi-pyclient)
+
+执行如下命令
+
+1. ```bash
+   chmod a+x ./fishpi-pyclient
+   ```
+
+2. ```bash
+   ./fishpi-pyclient
+   ```
+
+然后需要在偏好设置这里,如下图:
+![WechatIMG482.jpg](https://file.fishpi.cn/2023/12/WechatIMG482-3c599a0e.jpg)
+
+### pip安装
+
 环境: Python3.9 以上
 
 执行
@@ -16,15 +35,11 @@
 pip install fishpi-pyclient
 ```
 
-## 运行
-
 ```bash
 fishpi-pyclient -u username -p password -c <两步验证码>
 ```
 
 ## 调试
-
-如果你已安装,请先卸载，否则启动调试会执行安装好的包
 
 ```bash
 python core.py
