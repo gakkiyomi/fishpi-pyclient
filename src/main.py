@@ -21,8 +21,9 @@ def run(options: CliOptions):
 @click.option("--password", "-p", type=click.STRING, help="密码")
 @click.option("--code", "-c", type=click.STRING, help="两步验证码")
 @click.option("--file_path", "-f", type=click.STRING, help="配置文件路径")
-def cli(username: str, password: str, code: str, file_path: str) -> str:
-    run(CliOptions(username, password, code, file_path))
+@click.option("--host", "-h", type=click.STRING, help="配置域名")
+def cli(username: str, password: str, code: str, file_path: str, host: str) -> str:
+    run(CliOptions(username, password, code, file_path, host))
 
 
 def signal_handler(sig, frame):

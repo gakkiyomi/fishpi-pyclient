@@ -6,7 +6,9 @@ import sys
 
 import requests
 
-from src.utils import HELP, HOST, UA
+from src.utils import HELP, UA
+
+from .config import GLOBAL_CONFIG
 
 
 class Base(object):
@@ -26,13 +28,13 @@ class Base(object):
             'userPassword': hashlib.md5(str(password).encode('utf-8')).hexdigest(),
             'mfaCode': mfa_code
         }
-        res = requests.post(f"{HOST}/api/getKey",
+        res = requests.post(f"{GLOBAL_CONFIG.host}/api/getKey",
                             json=params, headers={'User-Agent': UA})
         rsp = json.loads(res.text)
         if rsp['code'] == 0:
             self.set_token(rsp['Key'])
             self.set_current_user(username)
-            print(f'登陆成功! 更多功能与趣味游戏请访问网页端: {HOST}')
+            print(f'登陆成功! 更多功能与趣味游戏请访问网页端: {GLOBAL_CONFIG.host}')
             print(HELP)
         elif rsp['code'] == -1 and rsp['msg'] == '两步验证失败，请填写正确的一次性密码':
             self.set_token('')

@@ -38,19 +38,21 @@ class ChatConfig(object):
 
 
 class Config(object):
-    def __init__(self, auth: AuthConfig = None, redpacket: RedPacketConfig = None, chat: ChatConfig = None, cfg_path: str = None):
+    def __init__(self, auth: AuthConfig = None, redpacket: RedPacketConfig = None, chat: ChatConfig = None, cfg_path: str = None, host: str = 'https://fishpi.cn'):
         self.auth_config = auth
         self.redpacket_config = redpacket
         self.chat_config = chat
         self.cfg_path = cfg_path
+        self.host = host
 
 
 class CliOptions(object):
-    def __init__(self, username: str = '', password: str = '', code: str = '', file_path: str = None):
+    def __init__(self, username: str = '', password: str = '', code: str = '', file_path: str = None, host: str = None):
         self.username = username
         self.password = password
         self.code = code
         self.file_path = file_path
+        self.host = host
 
 
 GLOBAL_CONFIG = Config()

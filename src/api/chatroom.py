@@ -5,9 +5,10 @@ import random
 import requests
 
 from src.api import Base
-from src.utils import HOST, UA
+from src.utils import UA
 from src.utils.version import __version__
 
+from .config import GLOBAL_CONFIG
 from .redpacket import *
 
 
@@ -19,7 +20,7 @@ class ChatRoomAPI(Base):
     def more(self, page: int = 1) -> None | dict:
         if self.api_key == '':
             return None
-        resp = requests.get(f"{HOST}/chat-room/more?page={page}",
+        resp = requests.get(f"{GLOBAL_CONFIG.host}/chat-room/more?page={page}",
                             headers={'User-Agent': UA})
         return json.loads(resp.text)
 
@@ -28,7 +29,7 @@ class ChatRoomAPI(Base):
             return None
         params = {'apiKey': self.api_key, 'content': message,
                   'client': f'Python/客户端v{__version__}'}
-        ret = requests.post(f'{HOST}/chat-room/send',
+        ret = requests.post(f'{GLOBAL_CONFIG.host}/chat-room/send',
                             json=params, headers={'User-Agent': UA})
         ret_json = json.loads(ret.text)
         if ('code' in ret_json and ret_json['code'] == -1):
@@ -39,7 +40,7 @@ class ChatRoomAPI(Base):
             return None
         params = {'apiKey': self.api_key,
                   'client': f'Python/客户端v{__version__}'}
-        ret = requests.delete(f'{HOST}/chat-room/revoke/{msg_id}',
+        ret = requests.delete(f'{GLOBAL_CONFIG.host}/chat-room/revoke/{msg_id}',
                               json=params, headers={'User-Agent': UA})
         ret_json = json.loads(ret.text)
         if ('code' in ret_json and ret_json['code'] == -1):
@@ -57,7 +58,7 @@ class ChatRoomAPI(Base):
             'oId': red_packet_id
         }
         resp = requests.post(
-            f"{HOST}/chat-room/red-packet/open", json=params, headers={'User-Agent': UA})
+            f"{GLOBAL_CONFIG.host}/chat-room/red-packet/open", json=params, headers={'User-Agent': UA})
         return json.loads(resp.text)
 
     def open_rock_paper_scissors_redpacket(self, red_packet_id, gesture: int = -1) -> dict:
@@ -69,5 +70,5 @@ class ChatRoomAPI(Base):
             'gesture': gesture
         }
         resp = requests.post(
-            f"{HOST}/chat-room/red-packet/open", json=params, headers={'User-Agent': UA})
+            f"{GLOBAL_CONFIG.host}/chat-room/red-packet/open", json=params, headers={'User-Agent': UA})
         return json.loads(resp.text)
