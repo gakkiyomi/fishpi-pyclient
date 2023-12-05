@@ -98,5 +98,5 @@ class ChatRoom(WS):
 
 
 def fish_ball_trigger(api: FishPi, message: dict) -> None:
-    if 'sevenSummer' == message["userName"] and '天降鱼丸, [0,10] 随机个数. 限时 1 min. 冲鸭~' == message["md"]:
+    if 'sevenSummer' == message["userName"] and message["md"].__contains__('天降鱼丸, [0,10] 随机个数. 限时 1 min. 冲鸭~'):
         api.chatroom.send(GLOBAL_CONFIG.chat_config.fish_ball)
