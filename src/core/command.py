@@ -125,7 +125,7 @@ class BrushLivenessCommand(Command):
 
 class GetRewardCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        api.chatroom.send("小冰 去打劫") #魔法
+        api.chatroom.send("小冰 去打劫")  # 魔法
         # api.user.get_yesterday_reward()
 
 

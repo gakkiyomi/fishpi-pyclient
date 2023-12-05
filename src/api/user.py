@@ -92,3 +92,12 @@ class UserAPI(Base):
             print('转账成功')
         else:
             print(response['msg'])
+
+    def get_username_by_key(self, key: str) -> str | None:
+        resp = requests.get(
+            f'{GLOBAL_CONFIG.host}/api/user?apiKey={key}', headers={'User-Agent': UA})
+        response = json.loads(resp.text)
+        if 'data' in response:
+            return response['data']['userName']
+        else:
+            return None

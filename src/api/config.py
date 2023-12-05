@@ -13,10 +13,11 @@ class RedPacketConfig(object):
 
 
 class AuthConfig(object):
-    def __init__(self, username='', password='', mfa_code=''):
+    def __init__(self, username='', password='', mfa_code='', key=''):
         self.username = username
         self.password = password
         self.mfa_code = mfa_code
+        self.key = key
         self.accounts: list[tuple[str, ...]] = []
 
     def add_account(self, username='', password=''):

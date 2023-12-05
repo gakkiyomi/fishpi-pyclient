@@ -13,11 +13,11 @@ from .config import GLOBAL_CONFIG
 
 class Base(object):
     def __init__(self, key=''):
-        self.current_user = ''
+        self.current_user: str = ''
         self.set_token(key)
 
-    def set_token(self, api_key=''):
-        self.api_key = api_key
+    def set_token(self, api_key: str = ''):
+        self.api_key: str = api_key
 
     def set_current_user(self, username):
         self.current_user = username
