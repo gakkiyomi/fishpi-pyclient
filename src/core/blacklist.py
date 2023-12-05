@@ -18,10 +18,10 @@ def release_someone(api: FishPi, username: str) -> None:
     if GLOBAL_CONFIG.cfg_path is None:
         return
     # 持久化到文件
-    src = open(GLOBAL_CONFIG.cfg_path, "r+")
+    src = open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8')
     config_text = src.read()
     src.close()
-    dst = open(GLOBAL_CONFIG.cfg_path, 'w')
+    dst = open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8')
     if len(GLOBAL_CONFIG.chat_config.blacklist) == 0:
         after = r'blacklist=[""]'
     else:
@@ -43,10 +43,10 @@ def ban_someone(api: FishPi, username: str) -> None:
     if GLOBAL_CONFIG.cfg_path is None:
         return
     # 持久化到文件
-    src = open(GLOBAL_CONFIG.cfg_path, "r+")
+    src = open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8')
     config_text = src.read()
     src.close()
-    dst = open(GLOBAL_CONFIG.cfg_path, 'w')
+    dst = open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8')
     after = "blacklist=" + \
         str(GLOBAL_CONFIG.chat_config.blacklist).replace("\'", "\"")
     dst.write(re.sub(r'blacklist.*', after, config_text))
