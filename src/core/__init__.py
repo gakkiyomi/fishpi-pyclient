@@ -104,7 +104,6 @@ class LoginInitor(Initor):
         api.sockpuppets[api.current_user] = UserInfo(
             api.current_user, GLOBAL_CONFIG.auth_config.password, api.api_key)
         api.sockpuppets[api.current_user].is_online = True
-        check_in(api)
 
 
 class ChaRoomInitor(Initor):
