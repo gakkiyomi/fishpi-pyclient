@@ -73,6 +73,11 @@ class EnterChatroom(Command):
             cr.start()
 
 
+class SiGuoYa(Command):
+    def exec(self, api: FishPi, args: Tuple[str, ...]):
+        api.chatroom.siguoya()
+
+
 class AnswerMode(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         if GLOBAL_CONFIG.chat_config.answer_mode:
@@ -328,6 +333,7 @@ def init_cli(api: FishPi):
     cli_handler.add_command('#help', help_c)
     cli_handler.add_command('#cli', EnterCil())
     cli_handler.add_command('#chatroom', EnterChatroom())
+    cli_handler.add_command('#siguo', SiGuoYa())
     cli_handler.add_command('#bm', BreezemoonsCommand())
     cli_handler.add_command('#api-key', GetAPIKey())
     cli_handler.add_command('#transfer', PointTransferCommand())

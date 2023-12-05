@@ -72,3 +72,16 @@ class ChatRoomAPI(Base):
         resp = requests.post(
             f"{GLOBAL_CONFIG.host}/chat-room/red-packet/open", json=params, headers={'User-Agent': UA})
         return json.loads(resp.text)
+
+    def siguoya(self) -> None:
+        resp = requests.get(
+            f"{GLOBAL_CONFIG.host}/chat-room/si-guo-list", headers={'User-Agent': UA})
+        ret = json.loads(resp.text)
+        if ('code' in ret and ret['code'] == -1):
+            print('思过崖空无一人')
+        else:
+            if len(ret['data']) == 0:
+                print('思过崖空无一人')
+            else:
+                print(
+                    f'思过崖: {list(map(lambda x: x["userName"] ,ret["data"]))}')
