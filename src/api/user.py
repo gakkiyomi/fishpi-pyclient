@@ -5,7 +5,9 @@ import json
 import requests
 
 from src.api import Base
-from src.utils import HOST, UA
+from src.utils import UA
+
+from .config import GLOBAL_CONFIG
 
 
 class UserAPI(Base):
@@ -17,7 +19,7 @@ class UserAPI(Base):
         if self.api_key == '':
             return None
         resp = requests.get(
-            f'{HOST}/user/{username}?apiKey={self.api_key}', headers={'User-Agent': UA})
+            f'{GLOBAL_CONFIG.host}/user/{username}?apiKey={self.api_key}', headers={'User-Agent': UA})
         if resp.status_code == 200:
             data = json.loads(resp.text)
             if data.get('code') is not None and data['code'] == -1:
@@ -29,7 +31,7 @@ class UserAPI(Base):
 
     def get_online_users(self) -> dict:
         resp = requests.get(
-            f'{HOST}/chat-room/online-users', headers={'User-Agent': UA})
+            f'{GLOBAL_CONFIG.host}/chat-room/online-users', headers={'User-Agent': UA})
         return json.loads(resp.text)
 
     def get_yesterday_reward(self) -> None:
@@ -37,7 +39,7 @@ class UserAPI(Base):
             print('你已经领取过昨日活跃度奖励了')
             return
         resp = requests.get(
-            f'{HOST}/activity/yesterday-liveness-reward-api?apiKey={self.api_key}', headers={'User-Agent': UA})
+            f'{GLOBAL_CONFIG.host}/activity/yesterday-liveness-reward-api?apiKey={self.api_key}', headers={'User-Agent': UA})
         response = json.loads(resp.text)
         reward = response['sum']
         if reward == -1:
@@ -47,7 +49,7 @@ class UserAPI(Base):
         self.reward = True
 
     def send_breezemoon(self, content: str) -> None:
-        res = requests.post(f'{HOST}/breezemoon', headers={'User-Agent': UA}, json={
+        res = requests.post(f'{GLOBAL_CONFIG.host}/breezemoon', headers={'User-Agent': UA}, json={
             'apiKey': self.api_key,
             'breezemoonContent': content
         })
@@ -59,7 +61,7 @@ class UserAPI(Base):
 
     def get_breezemoons(self, username: str, page: int = 1, size: int = 10) -> dict | None:
         resp = requests.get(
-            f'{HOST}/api/user/{username}/breezemoons?p={page}&size={size}&apiKey={self.api_key}', headers={'User-Agent': UA})
+            f'{GLOBAL_CONFIG.host}/api/user/{username}/breezemoons?p={page}&size={size}&apiKey={self.api_key}', headers={'User-Agent': UA})
         response = json.loads(resp.text)
         if 'code' in response and response['code'] == 0:
             return response['data']['breezemoons']
@@ -69,16 +71,16 @@ class UserAPI(Base):
 
     def checked_status(self) -> dict:
         resp = requests.get(
-            f'{HOST}/user/checkedIn?apiKey={self.api_key}', headers={'User-Agent': UA})
+            f'{GLOBAL_CONFIG.host}/user/checkedIn?apiKey={self.api_key}', headers={'User-Agent': UA})
         return json.loads(resp.text)
 
     def get_liveness_info(self) -> dict:
         resp = requests.get(
-            f'{HOST}/user/liveness?apiKey={self.api_key}', headers={'User-Agent': UA})
+            f'{GLOBAL_CONFIG.host}/user/liveness?apiKey={self.api_key}', headers={'User-Agent': UA})
         return json.loads(resp.text)
 
     def transfer(self, to: str, amount: int = 32, memo: str = '给') -> None:
-        resp = requests.post(f'{HOST}/point/transfer', headers={'User-Agent': UA},
+        resp = requests.post(f'{GLOBAL_CONFIG.host}/point/transfer', headers={'User-Agent': UA},
                              json={
             'apiKey': self.api_key,
             'userName': to,

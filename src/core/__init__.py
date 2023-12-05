@@ -1,6 +1,6 @@
 import json
 import os
-import sys
+import re
 from abc import ABC, abstractmethod
 from configparser import ConfigParser, NoOptionError
 from typing import Any
@@ -17,6 +17,7 @@ from src.api.config import (
 )
 from src.core.command import init_cli
 from src.core.user import check_in
+from src.utils import HOST
 
 from .chatroom import ChatRoom, init_soliloquize
 
@@ -56,6 +57,7 @@ class FileConfigInitor(Initor):
                 GLOBAL_CONFIG.redpacket_config = int_redpacket_config(config)
                 GLOBAL_CONFIG.chat_config = init_chat_config(config)
                 GLOBAL_CONFIG.cfg_path = file_path
+                GLOBAL_CONFIG.host = init_host_config(config)
         except Exception as e:
             print(f'{file_path}配置文件不合法')
 
@@ -67,6 +69,7 @@ class DefualtConfigInitor(Initor):
         GLOBAL_CONFIG.redpacket_config = RedPacketConfig()
         GLOBAL_CONFIG.chat_config = ChatConfig()
         GLOBAL_CONFIG.cfg_path = None
+        GLOBAL_CONFIG.host = HOST
 
 
 class EnvConfigInitor(Initor):
@@ -194,6 +197,12 @@ def init_userinfo_with_options(options: CliOptions) -> None:
     if options.password is not None:
         GLOBAL_CONFIG.auth_config.password = options.password
     GLOBAL_CONFIG.auth_config.mfa_code = options.code
+    if options.host is not None:
+        pattern = re.compile(r'^https?://')
+        if pattern.match(options.host):
+            GLOBAL_CONFIG.host = options.host
+        else:
+            GLOBAL_CONFIG.host = 'https://' + options.host
 
 
 def init_chat_config(config: ConfigParser) -> ChatConfig:
@@ -211,6 +220,20 @@ def init_chat_config(config: ConfigParser) -> ChatConfig:
     if ret.kw_blacklist.__contains__(''):
         ret.kw_blacklist.remove('')
     return ret
+
+
+def init_host_config(config: ConfigParser) -> str:
+    try:
+        host = config.get('auth', 'host')
+        if host is None:
+            return HOST
+        pattern = re.compile(r'^https?://')
+        if pattern.match(host):
+            return host
+        else:
+            return 'https://' + host
+    except NoOptionError:
+        return HOST
 
 
 FishPiInitor = InitChain()

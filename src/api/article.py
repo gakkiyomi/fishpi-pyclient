@@ -7,7 +7,9 @@ from typing import Any
 import requests
 
 from src.api import Base
-from src.utils import HOST, UA
+from src.utils import UA
+
+from .config import GLOBAL_CONFIG
 
 
 class ArticleType(Enum):
@@ -40,7 +42,7 @@ class ArticleAPI(Base):
         if self.api_key == '':
             return None
         resp = requests.post(
-            f'{HOST}/vote/up/article', headers={'User-Agent': UA}, json={
+            f'{GLOBAL_CONFIG.host}/vote/up/article', headers={'User-Agent': UA}, json={
                 'apiKey': self.api_key,
                 'dataId': article_id
             })
@@ -57,7 +59,7 @@ class ArticleAPI(Base):
             print('点赞失败')
 
     def thanks_for_article(self, article_id: str) -> None:
-        res = requests.post(f'{HOST}/article/thank?articleId={article_id}', headers={'User-Agent': UA}, json={
+        res = requests.post(f'{GLOBAL_CONFIG.host}/article/thank?articleId={article_id}', headers={'User-Agent': UA}, json={
             'apiKey': self.api_key
         })
         response = json.loads(res.text)
@@ -68,7 +70,7 @@ class ArticleAPI(Base):
 
     def list_articles(self, type: ArticleType = ArticleType.RECENT, page: int = 1, size: int = 20) -> dict:
         res = requests.get(
-            f'{HOST}/api/articles/{type}?p={page}&size={size}', headers={'User-Agent': UA}, json={
+            f'{GLOBAL_CONFIG.host}/api/articles/{type}?p={page}&size={size}', headers={'User-Agent': UA}, json={
                 'apiKey': self.api_key
             })
         response = json.loads(res.text)
@@ -79,7 +81,7 @@ class ArticleAPI(Base):
 
     def get_article(self, article_id: str) -> Article:
         res = requests.get(
-            f'{HOST}/api/article/{article_id}', headers={'User-Agent': UA}, json={
+            f'{GLOBAL_CONFIG.host}/api/article/{article_id}', headers={'User-Agent': UA}, json={
                 'apiKey': self.api_key
             })
         response = json.loads(res.text)
@@ -89,7 +91,7 @@ class ArticleAPI(Base):
             print('获取帖子详情失败: ' + response['msg'])
 
     def comment_article(self, article_id: str, comment: str) -> Article:
-        res = requests.post(f'{HOST}/comment/{article_id}', headers={'User-Agent': UA}, json={
+        res = requests.post(f'{GLOBAL_CONFIG.host}/comment/{article_id}', headers={'User-Agent': UA}, json={
             'apiKey': self.api_key,
             'articleId': article_id,
             'commentAnonymous': False,
