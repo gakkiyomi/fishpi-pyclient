@@ -63,10 +63,10 @@ def put_keyword_to_bl(args: tuple[str, ...]) -> None:
         if GLOBAL_CONFIG.cfg_path is None:
             return
         # 持久化到文件
-        src = open(GLOBAL_CONFIG.cfg_path, "r+")
+        src = open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8')
         config_text = src.read()
         src.close()
-        dst = open(GLOBAL_CONFIG.cfg_path, 'w')
+        dst = open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8')
         after = "kwBlacklist=" + \
             str(GLOBAL_CONFIG.chat_config.kw_blacklist).replace("\'", "\"")
         dst.write(re.sub(r'kwBlacklist.*', after, config_text))
@@ -83,10 +83,10 @@ def remove_keyword_to_bl(args: tuple[str, ...]) -> None:
         if GLOBAL_CONFIG.cfg_path is None:
             return
         # 持久化到文件
-        src = open(GLOBAL_CONFIG.cfg_path, "r+")
+        src = open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8')
         config_text = src.read()
         src.close()
-        dst = open(GLOBAL_CONFIG.cfg_path, 'w')
+        dst = open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8')
         after = "kwBlacklist=" + \
             str(GLOBAL_CONFIG.chat_config.kw_blacklist).replace("\'", "\"")
         dst.write(re.sub(r'kwBlacklist.*', after, config_text))
