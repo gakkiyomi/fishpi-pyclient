@@ -25,7 +25,7 @@ class AuthConfig(object):
 
 class ChatConfig(object):
     def __init__(self, blacklist=[], kw_blacklist=['你点的歌来了'], repeat_mode_switch=False, frequency=5, soliloquize_switch=False,
-                 soliloquize_frequency=20, sentences=[], answer_mode: bool = False):
+                 soliloquize_frequency=20, sentences=[], answer_mode: bool = False, fish_ball: str = '凌 捞鱼丸'):
         self.repeat_mode_switch = repeat_mode_switch
         self.frequency = frequency
         self.soliloquize_switch = soliloquize_switch
@@ -35,6 +35,7 @@ class ChatConfig(object):
         self.blacklist = blacklist
         self.kw_blacklist = kw_blacklist
         self.answer_mode = answer_mode
+        self.fish_ball = fish_ball
 
 
 class Config(object):
