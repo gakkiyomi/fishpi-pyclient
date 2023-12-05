@@ -52,6 +52,7 @@ def renderChatroomMsg(api: FishPi, message: dict) -> None:
     time = message["time"]
     user = message["userName"]
     user_nick_name = message["userNickname"]
+    fish_ball_trigger(api, message)
     if len(GLOBAL_CONFIG.chat_config.blacklist) > 0 and GLOBAL_CONFIG.chat_config.blacklist.__contains__(user):
         return
     if user == api.current_user:
@@ -75,8 +76,7 @@ def renderChatroomMsg(api: FishPi, message: dict) -> None:
         print(message["md"])
         print("\r\n")
     if GLOBAL_CONFIG.chat_config.repeat_mode_switch:
-        msg = message["md"]
-        repeat(api, msg)
+        repeat(api, message["md"])
 
 
 class ChatRoom(WS):
@@ -95,3 +95,8 @@ class ChatRoom(WS):
 
     def on_close(self, obj, close_status_code, close_msg):
         print("已经离开聊天室")
+
+
+def fish_ball_trigger(api: FishPi, message: dict) -> None:
+    if 'sevenSummer' == message["userName"] and '天降鱼丸, [0,10] 随机个数. 限时 1 min. 冲鸭~' == message["md"]:
+        api.chatroom.send(GLOBAL_CONFIG.chat_config.fish_ball)
