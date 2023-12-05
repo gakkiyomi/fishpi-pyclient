@@ -87,6 +87,7 @@ class CilConfigInitor(Initor):
 
 class LoginInitor(Initor):
     def exec(self, api: FishPi, options: CliOptions) -> None:
+        os.environ['NO_PROXY'] = GLOBAL_CONFIG.host
         while len(GLOBAL_CONFIG.auth_config.username) == 0:
             print('请输入用户名:')
             GLOBAL_CONFIG.auth_config.username = input("")
