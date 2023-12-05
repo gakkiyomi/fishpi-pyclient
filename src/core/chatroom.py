@@ -87,6 +87,7 @@ class ChatRoom(WS):
 
     def on_open(self, obj):
         print(f'欢迎{API.current_user}进入聊天室!')
+        API.chatroom.send("小冰 去打劫")
         if len(GLOBAL_CONFIG.chat_config.blacklist) > 0:
             print('小黑屋成员: ' + str(GLOBAL_CONFIG.chat_config.blacklist))
 
