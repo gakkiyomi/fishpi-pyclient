@@ -205,9 +205,13 @@ class ChangeCurrentUserCommand(Command):
                 password = input("")
                 api.login(target_user_name, password)
                 api_key = api.api_key
+            GLOBAL_CONFIG.auth_config.username = target_user_name
+            GLOBAL_CONFIG.auth_config.password = password
+            GLOBAL_CONFIG.auth_config.key = api_key
             api.sockpuppets[target_user_name] = UserInfo(
                 target_user_name, password, api_key)
             api.sockpuppets[target_user_name].online(ChatRoom().start)
+            breakpoint()
 
 
 class PointTransferCommand(Command):
