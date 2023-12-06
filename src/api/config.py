@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+from src.utils import HOST
+
+
 class RedPacketConfig(object):
     def __init__(self, red_packet_switch=True, heartbeat=True, smart_mode=True, threshold=0.5, adventure_mode=True,
                  timeout=7, rate=3, rps_limit=100):
@@ -55,6 +58,10 @@ class CliOptions(object):
         self.code = code
         self.file_path = file_path
         self.host = host
+
+
+def init_defualt_config() -> Config:
+    return Config(AuthConfig(), RedPacketConfig(), ChatConfig(), None, HOST)
 
 
 GLOBAL_CONFIG = Config()

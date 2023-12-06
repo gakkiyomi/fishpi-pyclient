@@ -19,7 +19,7 @@ COMMAND_GUIDE = '''
 [#rp-to] 32 Gakkiyomi,xiaoIce (积分 用户)专属红包
 [#rp-time] 3 设置抢红包等待时间
 [#bm] 发送清风明月
-[#api-key] 打印apikey
+[#config] 查看,导出配置文件 config [dump|show] {-d|-c} (file_path)
 [#answer] 进入|退出 答题模式
 [#checked] 查看当前是否签到
 [#reward] 领取昨日活跃奖励

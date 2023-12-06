@@ -10,15 +10,15 @@ import schedule
 from src.api import FishPi, UserInfo
 from src.api.config import (
     GLOBAL_CONFIG,
-    AuthConfig,
     ChatConfig,
     CliOptions,
     RedPacketConfig,
+    init_defualt_config,
 )
-from src.core.command import init_cli
 from src.utils import HOST
 
 from .chatroom import ChatRoom, init_soliloquize
+from .command import init_cli
 
 
 class Initor(ABC):
@@ -43,11 +43,12 @@ class Initor(ABC):
 class DefualtConfigInitor(Initor):
     def exec(self, api: FishPi, options: CliOptions) -> None:
         print("生成默认配置")
-        GLOBAL_CONFIG.auth_config = AuthConfig()
-        GLOBAL_CONFIG.redpacket_config = RedPacketConfig()
-        GLOBAL_CONFIG.chat_config = ChatConfig()
-        GLOBAL_CONFIG.cfg_path = None
-        GLOBAL_CONFIG.host = HOST
+        defualt = init_defualt_config()
+        GLOBAL_CONFIG.auth_config = defualt.auth_config
+        GLOBAL_CONFIG.redpacket_config = defualt.redpacket_config
+        GLOBAL_CONFIG.chat_config = defualt.chat_config
+        GLOBAL_CONFIG.cfg_path = defualt.cfg_path
+        GLOBAL_CONFIG.host = defualt.host
 
 
 class EnvConfigInitor(Initor):
