@@ -18,17 +18,17 @@ def release_someone(api: FishPi, username: str) -> None:
     if GLOBAL_CONFIG.cfg_path is None:
         return
     # 持久化到文件
-    src = open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8')
-    config_text = src.read()
-    src.close()
-    dst = open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8')
-    if len(GLOBAL_CONFIG.chat_config.blacklist) == 0:
-        after = r'blacklist=[""]'
-    else:
-        after = "blacklist=" + \
-            str(GLOBAL_CONFIG.chat_config.blacklist).replace("\'", "\"")
-    dst.write(re.sub(r'blacklist.*', after, config_text))
-    dst.close()
+    with open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8') as src:
+        config_text = src.read()
+
+    with open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8') as dst:
+        after = ''
+        if len(GLOBAL_CONFIG.chat_config.blacklist) == 0:
+            after = r'blacklist=[""]'
+        else:
+            after = "blacklist=" + \
+                str(GLOBAL_CONFIG.chat_config.blacklist).replace("\'", "\"")
+        dst.write(re.sub(r'blacklist.*', after, config_text))
 
 
 def ban_someone(api: FishPi, username: str) -> None:
@@ -43,14 +43,12 @@ def ban_someone(api: FishPi, username: str) -> None:
     if GLOBAL_CONFIG.cfg_path is None:
         return
     # 持久化到文件
-    src = open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8')
-    config_text = src.read()
-    src.close()
-    dst = open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8')
-    after = "blacklist=" + \
-        str(GLOBAL_CONFIG.chat_config.blacklist).replace("\'", "\"")
-    dst.write(re.sub(r'blacklist.*', after, config_text))
-    dst.close()
+    with open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8') as src:
+        config_text = src.read()
+    with open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8') as dst:
+        after = "blacklist=" + \
+            str(GLOBAL_CONFIG.chat_config.blacklist).replace("\'", "\"")
+        dst.write(re.sub(r'blacklist.*', after, config_text))
 
 
 def put_keyword_to_bl(args: tuple[str, ...]) -> None:
@@ -63,14 +61,12 @@ def put_keyword_to_bl(args: tuple[str, ...]) -> None:
         if GLOBAL_CONFIG.cfg_path is None:
             return
         # 持久化到文件
-        src = open(GLOBAL_CONFIG.cfg_path, "r+")
-        config_text = src.read()
-        src.close()
-        dst = open(GLOBAL_CONFIG.cfg_path, 'w')
-        after = "kwBlacklist=" + \
-            str(GLOBAL_CONFIG.chat_config.kw_blacklist).replace("\'", "\"")
-        dst.write(re.sub(r'kwBlacklist.*', after, config_text))
-        dst.close()
+        with open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8') as src:
+            config_text = src.read()
+        with open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8') as dst:
+            after = "kwBlacklist=" + \
+                str(GLOBAL_CONFIG.chat_config.kw_blacklist).replace("\'", "\"")
+            dst.write(re.sub(r'kwBlacklist.*', after, config_text))
 
 
 def remove_keyword_to_bl(args: tuple[str, ...]) -> None:
@@ -83,11 +79,13 @@ def remove_keyword_to_bl(args: tuple[str, ...]) -> None:
         if GLOBAL_CONFIG.cfg_path is None:
             return
         # 持久化到文件
-        src = open(GLOBAL_CONFIG.cfg_path, "r+")
-        config_text = src.read()
-        src.close()
-        dst = open(GLOBAL_CONFIG.cfg_path, 'w')
-        after = "kwBlacklist=" + \
-            str(GLOBAL_CONFIG.chat_config.kw_blacklist).replace("\'", "\"")
-        dst.write(re.sub(r'kwBlacklist.*', after, config_text))
-        dst.close()
+        with open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8') as src:
+            config_text = src.read()
+        with open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8') as dst:
+            after = ''
+            if len(GLOBAL_CONFIG.chat_config.blacklist) == 0:
+                after = r'kwBlacklist=[""]'
+            else:
+                after = "kwBlacklist=" + \
+                    str(GLOBAL_CONFIG.chat_config.kw_blacklist).replace("\'", "\"")
+            dst.write(re.sub(r'kwBlacklist.*', after, config_text))

@@ -6,20 +6,20 @@ from configparser import ConfigParser, NoOptionError
 from typing import Any
 
 import schedule
+from colorama import just_fix_windows_console
 
 from src.api import FishPi, UserInfo
 from src.api.config import (
     GLOBAL_CONFIG,
-    AuthConfig,
     ChatConfig,
     CliOptions,
     RedPacketConfig,
+    init_defualt_config,
 )
-from src.core.command import init_cli
-from src.core.user import check_in
 from src.utils import HOST
 
 from .chatroom import ChatRoom, init_soliloquize
+from .command import init_cli
 
 
 class Initor(ABC):
@@ -39,6 +39,26 @@ class Initor(ABC):
     def init(self, api: FishPi, options: CliOptions) -> None:
         self.exec(api, options)
         self.next.init(api, options)
+
+
+class DefualtConfigInitor(Initor):
+    def exec(self, api: FishPi, options: CliOptions) -> None:
+        print("生成默认配置")
+        defualt = init_defualt_config()
+        GLOBAL_CONFIG.auth_config = defualt.auth_config
+        GLOBAL_CONFIG.redpacket_config = defualt.redpacket_config
+        GLOBAL_CONFIG.chat_config = defualt.chat_config
+        GLOBAL_CONFIG.cfg_path = defualt.cfg_path
+        GLOBAL_CONFIG.host = defualt.host
+
+
+class EnvConfigInitor(Initor):
+    def exec(self, api: FishPi, options: CliOptions) -> None:
+        GLOBAL_CONFIG.auth_config.username = os.environ.get(
+            "FISH_PI_USERNAME", '')
+        GLOBAL_CONFIG.auth_config.password = os.environ.get(
+            "FISH_PI_PASSWORD", '')
+        GLOBAL_CONFIG.auth_config.key = os.environ.get('FISH_PI_KEY', '')
 
 
 class FileConfigInitor(Initor):
@@ -62,49 +82,53 @@ class FileConfigInitor(Initor):
             print(f'{file_path}配置文件不合法')
 
 
-class DefualtConfigInitor(Initor):
-    def exec(self, api: FishPi, options: CliOptions) -> None:
-        print("生成默认配置")
-        GLOBAL_CONFIG.auth_config = AuthConfig()
-        GLOBAL_CONFIG.redpacket_config = RedPacketConfig()
-        GLOBAL_CONFIG.chat_config = ChatConfig()
-        GLOBAL_CONFIG.cfg_path = None
-        GLOBAL_CONFIG.host = HOST
-
-
-class EnvConfigInitor(Initor):
-    def exec(self, api: FishPi, options: CliOptions) -> None:
-        GLOBAL_CONFIG.auth_config.username = os.environ.get(
-            "FISH_PI_USERNAME", '')
-        GLOBAL_CONFIG. auth_config.password = os.environ.get(
-            "FISH_PI_PASSWORD", '')
-
-
 class CilConfigInitor(Initor):
     def exec(self, api: FishPi, options: CliOptions) -> None:
         init_userinfo_with_options(options)
+        just_fix_windows_console()
 
 
 class LoginInitor(Initor):
     def exec(self, api: FishPi, options: CliOptions) -> None:
         os.environ['NO_PROXY'] = GLOBAL_CONFIG.host
-        while len(GLOBAL_CONFIG.auth_config.username) == 0:
-            print('请输入用户名:')
-            GLOBAL_CONFIG.auth_config.username = input("")
-        while len(GLOBAL_CONFIG.auth_config.password) == 0:
-            print('请输入密码:')
-            GLOBAL_CONFIG.auth_config.password = input("")
-        api.login(GLOBAL_CONFIG.auth_config.username,
-                  GLOBAL_CONFIG.auth_config.password,
-                  GLOBAL_CONFIG.auth_config.mfa_code)
+        if GLOBAL_CONFIG.auth_config.key == '':
+            while len(GLOBAL_CONFIG.auth_config.username) == 0:
+                print('请输入用户名:')
+                GLOBAL_CONFIG.auth_config.username = input("")
+            while len(GLOBAL_CONFIG.auth_config.password) == 0:
+                print('请输入密码:')
+                GLOBAL_CONFIG.auth_config.password = input("")
+            api.login(GLOBAL_CONFIG.auth_config.username,
+                      GLOBAL_CONFIG.auth_config.password,
+                      GLOBAL_CONFIG.auth_config.mfa_code)
+            GLOBAL_CONFIG.auth_config.key = api.api_key
+        else:
+            # 直接使用api-key
+            username = api.user.get_username_by_key(
+                GLOBAL_CONFIG.auth_config.key)
+            if username is not None:
+                GLOBAL_CONFIG.auth_config.username = username
+                api.set_token(GLOBAL_CONFIG.auth_config.key)
+                api.current_user = username
+            else:
+                print("非法API-KEY, 使用账户密码登陆")
+                while len(GLOBAL_CONFIG.auth_config.username) == 0:
+                    print('请输入用户名:')
+                    GLOBAL_CONFIG.auth_config.username = input("")
+                while len(GLOBAL_CONFIG.auth_config.password) == 0:
+                    print('请输入密码:')
+                    GLOBAL_CONFIG.auth_config.password = input("")
+                api.login(GLOBAL_CONFIG.auth_config.username,
+                          GLOBAL_CONFIG.auth_config.password,
+                          GLOBAL_CONFIG.auth_config.mfa_code)
+                GLOBAL_CONFIG.auth_config.key = api.api_key
         if len(GLOBAL_CONFIG.auth_config.accounts) != 0:
-            for account in GLOBAL_CONFIG.auth_config.accounts:
-                api.sockpuppets[account[0]] = UserInfo(
-                    account[0], account[1], '')
+            api.sockpuppets = {account[0]: UserInfo(
+                account[0], account[1], '') for account in GLOBAL_CONFIG.auth_config.accounts}
         api.sockpuppets[api.current_user] = UserInfo(
             api.current_user, GLOBAL_CONFIG.auth_config.password, api.api_key)
         api.sockpuppets[api.current_user].is_online = True
-        check_in(api)
+        api.user_key_write_to_config_file()
 
 
 class ChaRoomInitor(Initor):
@@ -177,13 +201,38 @@ def int_redpacket_config(config: ConfigParser) -> RedPacketConfig:
 
 
 def init_auth_config(config: ConfigParser) -> None:
-    GLOBAL_CONFIG.auth_config = AuthConfig(config.get('auth', 'username'),
-                                           config.get('auth', 'password'))
     try:
-        sockpuppet_usernames = config.get(
-            'auth', 'sockpuppet_usernames').replace('，', ',').split(',')
-        sockpuppet_passwords = config.get(
-            'auth', 'sockpuppet_passwords').replace('，', ',').split(',')
+        if len(config.get('auth', 'username')) != 0:
+            GLOBAL_CONFIG.auth_config.username = config.get('auth', 'username')
+    except NoOptionError:
+        pass
+    try:
+        if len(config.get('auth', 'password')) != 0:
+            GLOBAL_CONFIG.auth_config.password = config.get('auth', 'password')
+    except NoOptionError:
+        pass
+    try:
+        if len(config.get('auth', 'key')) != 0:
+            GLOBAL_CONFIG.auth_config.key = config.get('auth', 'key')
+    except NoOptionError:
+        pass
+    init_sockpuppets(config)
+
+
+def init_sockpuppets(config: ConfigParser) -> None:
+    try:
+        sockpuppet_usernames = []
+        sockpuppet_passwords = []
+        usernames = config.get(
+            'auth', 'sockpuppet_usernames')
+        if len(usernames) != 0:
+            sockpuppet_usernames = usernames.replace('，', ',').split(',')
+        passwords = config.get(
+            'auth', 'sockpuppet_passwords')
+        if len(passwords) != 0:
+            sockpuppet_passwords = passwords.replace('，', ',').split(',')
+        if len(sockpuppet_usernames) == 0 or len(sockpuppet_usernames) != len(sockpuppet_passwords):
+            return
         sockpuppets = zip(sockpuppet_usernames, sockpuppet_passwords)
         for sockpuppet in sockpuppets:
             GLOBAL_CONFIG.auth_config.add_account(
@@ -195,6 +244,8 @@ def init_auth_config(config: ConfigParser) -> None:
 def init_userinfo_with_options(options: CliOptions) -> None:
     if options.username is not None:
         GLOBAL_CONFIG.auth_config.username = options.username
+        GLOBAL_CONFIG.auth_config.password = ''
+        GLOBAL_CONFIG.auth_config.key = ''
     if options.password is not None:
         GLOBAL_CONFIG.auth_config.password = options.password
     GLOBAL_CONFIG.auth_config.mfa_code = options.code
@@ -221,7 +272,23 @@ def init_chat_config(config: ConfigParser) -> ChatConfig:
     if ret.kw_blacklist.__contains__(''):
         ret.kw_blacklist.remove('')
     ret.fish_ball = config.get('chat', "fishBall")
+    init_chat_color(ret, config)
     return ret
+
+
+def init_chat_color(ret: ChatConfig, config: ConfigParser) -> None:
+    try:
+        user_color = config.get('chat', "chatUserColor")
+        if user_color != '':
+            ret.chat_user_color = user_color
+    except NoOptionError:
+        pass
+    try:
+        content_color = config.get('chat', "chatContentColor")
+        if content_color != '':
+            ret.chat_content_color = content_color
+    except NoOptionError:
+        pass
 
 
 def init_host_config(config: ConfigParser) -> str:

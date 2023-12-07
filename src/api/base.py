@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import re
 import sys
 
 import requests
@@ -13,11 +14,11 @@ from .config import GLOBAL_CONFIG
 
 class Base(object):
     def __init__(self, key=''):
-        self.current_user = ''
+        self.current_user: str = ''
         self.set_token(key)
 
-    def set_token(self, api_key=''):
-        self.api_key = api_key
+    def set_token(self, api_key: str = ''):
+        self.api_key: str = api_key
 
     def set_current_user(self, username):
         self.current_user = username
@@ -45,3 +46,13 @@ class Base(object):
         else:
             print(f"登陆失败: {rsp['msg']}")
             sys.exit(0)
+
+    def user_key_write_to_config_file(self):
+        # 持久化到文件
+        if GLOBAL_CONFIG.cfg_path is None:
+            return
+        with open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8') as src:
+            config_text = src.read()
+        with open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8') as dst:
+            after = f"key={self.api_key}"
+            dst.write(re.sub(r'key=.*', after, config_text))

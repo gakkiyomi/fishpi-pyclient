@@ -6,7 +6,7 @@ from typing import Tuple
 from objprint import op
 
 from src.api import FishPi, UserInfo
-from src.api.config import GLOBAL_CONFIG
+from src.api.config import GLOBAL_CONFIG, AuthConfig, init_defualt_config
 from src.api.redpacket import RedPacket, RedPacketType, RPSRedPacket, SpecifyRedPacket
 from src.utils import (
     COMMAND_GUIDE,
@@ -88,9 +88,40 @@ class AnswerMode(Command):
             print("进入答题模式")
 
 
-class GetAPIKey(Command):
+class ConfigCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        print(api.api_key)
+        current_user = api.sockpuppets[api.current_user]
+        lt = [i for i in args]
+        it = iter(lt)
+        if len(lt) < 2:
+            print('非法指令, 正确指令为: config [dump|show] {-d|-c} (file_path)')
+        opreator = next(it)
+        if opreator == 'dump':
+            if len(lt) != 3:
+                print('非法指令, 正确指令为: config [dump|show] {-d|-c} (file_path)')
+            config_option = next(it)
+            if config_option == '-d':
+                # dump defualt config to a file
+                default_config = init_defualt_config()
+                op(default_config)
+            elif config_option == '-c':
+                # dump current config to a file
+                print('非法指令, dump文件仅支持 -d 和 -c 参数')
+            else:
+                print('非法指令, 正确指令为: dump config {-d|-c} file_path')
+        elif opreator == 'show':
+            config_option = next(it)
+            if config_option == '-d':
+                # show defualt config
+                default_config = init_defualt_config()
+                op(default_config)
+            elif config_option == '-c':
+                # show current config
+                op(GLOBAL_CONFIG)
+            else:
+                print('非法指令, 正确指令为: dump show {-d|-c}')
+        else:
+            print('非法指令, 更多功能敬请期待!')
 
 
 class BreezemoonsCommand(Command):
@@ -125,7 +156,8 @@ class BrushLivenessCommand(Command):
 
 class GetRewardCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        api.user.get_yesterday_reward()
+        api.chatroom.send("小冰 去打劫")  # 魔法
+        # api.user.get_yesterday_reward()
 
 
 class GetPointCommand(Command):
@@ -204,6 +236,9 @@ class ChangeCurrentUserCommand(Command):
                 password = input("")
                 api.login(target_user_name, password)
                 api_key = api.api_key
+            GLOBAL_CONFIG.auth_config.username = target_user_name
+            GLOBAL_CONFIG.auth_config.password = password
+            GLOBAL_CONFIG.auth_config.key = api_key
             api.sockpuppets[target_user_name] = UserInfo(
                 target_user_name, password, api_key)
             api.sockpuppets[target_user_name].online(ChatRoom().start)
@@ -335,7 +370,7 @@ def init_cli(api: FishPi):
     cli_handler.add_command('#chatroom', EnterChatroom())
     cli_handler.add_command('#siguo', SiGuoYa())
     cli_handler.add_command('#bm', BreezemoonsCommand())
-    cli_handler.add_command('#api-key', GetAPIKey())
+    cli_handler.add_command('#config', ConfigCommand())
     cli_handler.add_command('#transfer', PointTransferCommand())
     cli_handler.add_command('#answer', AnswerMode())
     cli_handler.add_command('#checked', CheckInCommand())

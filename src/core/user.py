@@ -22,10 +22,3 @@ def render_online_users(api: FishPi):
     for user in data['users']:
         print('用户: ' + user['userName'])
         print('----------------------')
-
-
-def check_in(api: FishPi):
-    if len(api.api_key) == 0:
-        print('未登录')
-    else:
-        api.user.get_yesterday_reward()

@@ -31,6 +31,10 @@ class UserInfo(object):
             self.api_key = API.api_key
         func()
         self.is_online = True
+        GLOBAL_CONFIG.auth_config.username = self.username
+        GLOBAL_CONFIG.auth_config.password = self.password
+        GLOBAL_CONFIG.auth_config.key = self.api_key
+        API.user_key_write_to_config_file()
 
     def offline(self) -> None:
         keys = list(self.ws.keys())
