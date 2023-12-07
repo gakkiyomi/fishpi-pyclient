@@ -77,7 +77,7 @@ def renderChatroomMsg(api: FishPi, message: dict) -> None:
         else:
             print(
                 colored(f"{user}说:", GLOBAL_CONFIG.chat_config.chat_user_color))
-        print(colored(message["md"],
+        print(colored(remove_msg_tail(message),
               GLOBAL_CONFIG.chat_config.chat_content_color))
         print("\r\n")
     if GLOBAL_CONFIG.chat_config.repeat_mode_switch:
@@ -99,9 +99,27 @@ class ChatRoom(WS):
         super().on_error(obj, error)
 
     def on_close(self, obj, close_status_code, close_msg):
-        print("已经离开聊天室")
+        print('已经离开聊天室')
 
 
 def fish_ball_trigger(api: FishPi, message: dict) -> None:
-    if 'sevenSummer' == message["userName"] and message["md"].__contains__('天降鱼丸, [0,10] 随机个数. 限时 1 min. 冲鸭~'):
+    if 'sevenSummer' == message['userName'] and message['md'].__contains__('天降鱼丸, [0,10] 随机个数. 限时 1 min. 冲鸭~'):
         api.chatroom.send(GLOBAL_CONFIG.chat_config.fish_ball)
+
+
+def remove_msg_tail(message: dict) -> str:
+    excluded_prefixes = [">", "##### 引用"]
+    excluded_substrings = [
+        "https://zsh4869.github.io/fishpi.io/?hyd=",
+        "extension-message",
+        ":sweat_drops:",
+        "下次更新时间",
+        "https://unv-shield.librian.net/api/unv_shield",
+        "EXP"
+    ]
+    if message["userName"] == 'b':
+        return message['md']
+    lines = message['md'].split('\n')
+    new_lines = [line for line in lines if not any(line.startswith(prefix) or line.strip(
+    ) == prefix or prefix in line for prefix in excluded_prefixes) and not any(substring in line for substring in excluded_substrings) and line != '']
+    return '\n'.join(new_lines)
