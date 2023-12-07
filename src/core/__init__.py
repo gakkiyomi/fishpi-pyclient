@@ -6,6 +6,7 @@ from configparser import ConfigParser, NoOptionError
 from typing import Any
 
 import schedule
+from colorama import just_fix_windows_console
 
 from src.api import FishPi, UserInfo
 from src.api.config import (
@@ -84,6 +85,7 @@ class FileConfigInitor(Initor):
 class CilConfigInitor(Initor):
     def exec(self, api: FishPi, options: CliOptions) -> None:
         init_userinfo_with_options(options)
+        just_fix_windows_console()
 
 
 class LoginInitor(Initor):
@@ -270,7 +272,23 @@ def init_chat_config(config: ConfigParser) -> ChatConfig:
     if ret.kw_blacklist.__contains__(''):
         ret.kw_blacklist.remove('')
     ret.fish_ball = config.get('chat', "fishBall")
+    init_chat_color(ret, config)
     return ret
+
+
+def init_chat_color(ret: ChatConfig, config: ConfigParser) -> None:
+    try:
+        user_color = config.get('chat', "chatUserColor")
+        if user_color != '':
+            ret.chat_user_color = user_color
+    except NoOptionError:
+        pass
+    try:
+        content_color = config.get('chat', "chatContentColor")
+        if content_color != '':
+            ret.chat_content_color = content_color
+    except NoOptionError:
+        pass
 
 
 def init_host_config(config: ConfigParser) -> str:

@@ -3,6 +3,7 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 
 import schedule
+from termcolor import colored
 
 from src.api import API, FishPi
 from src.api.config import GLOBAL_CONFIG
@@ -57,7 +58,8 @@ def renderChatroomMsg(api: FishPi, message: dict) -> None:
         return
     if user == api.current_user:
         print(f"\t\t\t\t\t\t[{time}]")
-        print(f'\t\t\t\t\t\t你说: {message["md"]}')
+        print(colored(
+            f'\t\t\t\t\t\t你说: {message["md"]}', GLOBAL_CONFIG.chat_config.chat_user_color))
         api.chatroom.last_msg_id = message['oId']
     else:
         if len(GLOBAL_CONFIG.chat_config.kw_blacklist) > 0:
@@ -70,10 +72,13 @@ def renderChatroomMsg(api: FishPi, message: dict) -> None:
         else:
             print(f"[{time}]")
         if len(user_nick_name) > 0:
-            print(f"{user_nick_name}({user})说:")
+            print(colored(f"{user_nick_name}({user})说:",
+                  GLOBAL_CONFIG.chat_config.chat_user_color))
         else:
-            print(f"{user}说:")
-        print(message["md"])
+            print(
+                colored(f"{user}说:", GLOBAL_CONFIG.chat_config.chat_user_color))
+        print(colored(message["md"],
+              GLOBAL_CONFIG.chat_config.chat_content_color))
         print("\r\n")
     if GLOBAL_CONFIG.chat_config.repeat_mode_switch:
         repeat(api, message["md"])
