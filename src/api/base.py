@@ -45,3 +45,6 @@ class Base(object):
         else:
             print(f"登陆失败: {rsp['msg']}")
             sys.exit(0)
+
+    def user_key_write_to_config_file():
+        pass

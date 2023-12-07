@@ -33,6 +33,7 @@ class UserInfo(object):
         self.is_online = True
         GLOBAL_CONFIG.auth_config.username = self.username
         GLOBAL_CONFIG.auth_config.password = self.password
+        GLOBAL_CONFIG.auth_config.key = self.api_key
 
     def offline(self) -> None:
         keys = list(self.ws.keys())
