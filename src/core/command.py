@@ -242,7 +242,6 @@ class ChangeCurrentUserCommand(Command):
             api.sockpuppets[target_user_name] = UserInfo(
                 target_user_name, password, api_key)
             api.sockpuppets[target_user_name].online(ChatRoom().start)
-            breakpoint()
 
 
 class PointTransferCommand(Command):

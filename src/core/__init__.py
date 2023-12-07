@@ -126,6 +126,7 @@ class LoginInitor(Initor):
         api.sockpuppets[api.current_user] = UserInfo(
             api.current_user, GLOBAL_CONFIG.auth_config.password, api.api_key)
         api.sockpuppets[api.current_user].is_online = True
+        api.user_key_write_to_config_file()
 
 
 class ChaRoomInitor(Initor):

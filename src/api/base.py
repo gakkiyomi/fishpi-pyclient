@@ -2,6 +2,7 @@
 
 import hashlib
 import json
+import re
 import sys
 
 import requests
@@ -46,5 +47,12 @@ class Base(object):
             print(f"登陆失败: {rsp['msg']}")
             sys.exit(0)
 
-    def user_key_write_to_config_file():
-        pass
+    def user_key_write_to_config_file(self):
+        # 持久化到文件
+        if GLOBAL_CONFIG.cfg_path is None:
+            return
+        with open(GLOBAL_CONFIG.cfg_path, "r+", encoding='utf-8') as src:
+            config_text = src.read()
+        with open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8') as dst:
+            after = f"key={self.api_key}"
+            dst.write(re.sub(r'key=.*', after, config_text))
