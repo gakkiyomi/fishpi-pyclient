@@ -92,9 +92,13 @@ class ConfigCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         current_user = api.sockpuppets[api.current_user]
         lt = [i for i in args]
+        if len(lt) == 0:
+            print('非法指令, 正确指令为: config [dump|show] {-d|-c} (file_path)')
+            return
         it = iter(lt)
         if len(lt) < 2:
             print('非法指令, 正确指令为: config [dump|show] {-d|-c} (file_path)')
+            return
         opreator = next(it)
         if opreator == 'dump':
             if len(lt) != 3:
