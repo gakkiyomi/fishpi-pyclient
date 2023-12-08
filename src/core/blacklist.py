@@ -24,11 +24,11 @@ def release_someone(api: FishPi, username: str) -> None:
     with open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8') as dst:
         after = ''
         if len(GLOBAL_CONFIG.chat_config.blacklist) == 0:
-            after = r'blacklist=[""]'
+            after = 'blacklist=[]'
         else:
             after = "blacklist=" + \
                 str(GLOBAL_CONFIG.chat_config.blacklist).replace("\'", "\"")
-        dst.write(re.sub(r'blacklist.*', after, config_text))
+        dst.write(re.sub(r'^blacklist\s*=.*', after, config_text))
 
 
 def ban_someone(api: FishPi, username: str) -> None:
@@ -48,7 +48,7 @@ def ban_someone(api: FishPi, username: str) -> None:
     with open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8') as dst:
         after = "blacklist=" + \
             str(GLOBAL_CONFIG.chat_config.blacklist).replace("\'", "\"")
-        dst.write(re.sub(r'blacklist.*', after, config_text))
+        dst.write(re.sub(r'blacklist\s*=.*', after, config_text))
 
 
 def put_keyword_to_bl(args: tuple[str, ...]) -> None:
@@ -66,7 +66,7 @@ def put_keyword_to_bl(args: tuple[str, ...]) -> None:
         with open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8') as dst:
             after = "kwBlacklist=" + \
                 str(GLOBAL_CONFIG.chat_config.kw_blacklist).replace("\'", "\"")
-            dst.write(re.sub(r'kwBlacklist.*', after, config_text))
+            dst.write(re.sub(r'^kwBlacklist\s*=.*', after, config_text))
 
 
 def remove_keyword_to_bl(args: tuple[str, ...]) -> None:
@@ -84,8 +84,8 @@ def remove_keyword_to_bl(args: tuple[str, ...]) -> None:
         with open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8') as dst:
             after = ''
             if len(GLOBAL_CONFIG.chat_config.blacklist) == 0:
-                after = r'kwBlacklist=[""]'
+                after = 'kwBlacklist=[]'
             else:
                 after = "kwBlacklist=" + \
                     str(GLOBAL_CONFIG.chat_config.kw_blacklist).replace("\'", "\"")
-            dst.write(re.sub(r'kwBlacklist.*', after, config_text))
+            dst.write(re.sub(r'^kwBlacklist\s*=.*', after, config_text))

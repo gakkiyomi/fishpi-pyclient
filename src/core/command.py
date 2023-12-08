@@ -90,7 +90,6 @@ class AnswerMode(Command):
 
 class ConfigCommand(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
-        current_user = api.sockpuppets[api.current_user]
         lt = [i for i in args]
         if len(lt) == 0:
             print('非法指令, 正确指令为: config [dump|show] {-d|-c} (file_path)')
@@ -101,13 +100,15 @@ class ConfigCommand(Command):
             return
         opreator = next(it)
         if opreator == 'dump':
-            if len(lt) != 3:
+            if len(lt) < 3:
                 print('非法指令, 正确指令为: config [dump|show] {-d|-c} (file_path)')
+                return
             config_option = next(it)
             if config_option == '-d':
                 # dump defualt config to a file
                 default_config = init_defualt_config()
-                op(default_config)
+                file_path = next(it)
+                print(default_config.to_ini_template())
             elif config_option == '-c':
                 # dump current config to a file
                 print('非法指令, dump文件仅支持 -d 和 -c 参数')

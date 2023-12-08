@@ -55,4 +55,4 @@ class Base(object):
             config_text = src.read()
         with open(GLOBAL_CONFIG.cfg_path, 'w', encoding='utf-8') as dst:
             after = f"key={self.api_key}"
-            dst.write(re.sub(r'key=.*', after, config_text))
+            dst.write(re.sub(r'key\s*=.*', after, config_text))

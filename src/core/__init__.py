@@ -192,9 +192,11 @@ def int_redpacket_config(config: ConfigParser) -> RedPacketConfig:
     ret.adventure_mode = config.getboolean(
         'redPacket', 'heartbeatAdventure')
     if config.getfloat('redPacket', 'heartbeatThreshold') < 0:
-        ret.threshold == 0.4
+        ret.threshold = 0.4
+    else:
+        ret.threshold = config.getfloat('redPacket', 'heartbeatThreshold')
     if ret.threshold > 1:
-        ret.threshold == 1
+        ret.threshold = 1
     ret.timeout = config.getint(
         'redPacket', 'heartbeatTimeout')
     return ret
@@ -203,6 +205,9 @@ def int_redpacket_config(config: ConfigParser) -> RedPacketConfig:
 def init_auth_config(config: ConfigParser) -> None:
     try:
         if len(config.get('auth', 'username')) != 0:
+            GLOBAL_CONFIG.auth_config.username = ''
+            GLOBAL_CONFIG.auth_config.password = ''
+            GLOBAL_CONFIG.auth_config.key = ''
             GLOBAL_CONFIG.auth_config.username = config.get('auth', 'username')
     except NoOptionError:
         pass
