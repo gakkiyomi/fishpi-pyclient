@@ -8,11 +8,15 @@
 
 ## 安装
 
+[版本列表](https://github.com/gakkiyomi/fishpi-pyclient/releases)
+
+### Windows系统
+
+下载后，双击打开
+
 ### MacOS系统
 
-[v2.0.0下载](https://github.com/gakkiyomi/fishpi-pyclient/releases/download/v2.0.0/fishpi-pyclient)
-
-执行如下命令
+下载后，执行如下命令
 
 1. ```bash
    chmod a+x ./fishpi-pyclient
