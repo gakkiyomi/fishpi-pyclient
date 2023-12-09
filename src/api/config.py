@@ -102,13 +102,12 @@ class Config(object):
         self.cfg_path = cfg_path
         self.host = host
 
-    def to_ini_template(self):
+    def to_ini_template(self) -> configparser.ConfigParser:
         config = configparser.ConfigParser()
         config['auth'] = self.auth_config.to_config()
         config['redPacket'] = self.redpacket_config.to_config()
         config['chat'] = self.chat_config.to_config()
-        with open('example.ini', 'w') as configfile:
-            config.write(configfile)
+        return config
 
 
 class CliOptions(object):

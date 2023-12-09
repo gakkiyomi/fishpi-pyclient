@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import os
 import re
 from abc import ABC, abstractmethod
 from typing import Tuple
@@ -6,7 +7,7 @@ from typing import Tuple
 from objprint import op
 
 from src.api import FishPi, UserInfo
-from src.api.config import GLOBAL_CONFIG, AuthConfig, init_defualt_config
+from src.api.config import GLOBAL_CONFIG, Config, init_defualt_config
 from src.api.redpacket import RedPacket, RedPacketType, RPSRedPacket, SpecifyRedPacket
 from src.utils import (
     COMMAND_GUIDE,
@@ -15,6 +16,7 @@ from src.utils import (
     RP_TIME_CODE_RE,
     TRANSFER_RE,
 )
+from src.utils.file import ensure_directory_exists
 
 from .blacklist import (
     ban_someone,
@@ -104,24 +106,28 @@ class ConfigCommand(Command):
                 print('非法指令, 正确指令为: config [dump|show] {-d|-c} (file_path)')
                 return
             config_option = next(it)
-            if config_option == '-d':
-                # dump defualt config to a file
-                default_config = init_defualt_config()
-                file_path = next(it)
-                print(default_config.to_ini_template())
-            elif config_option == '-c':
-                # dump current config to a file
-                print('非法指令, dump文件仅支持 -d 和 -c 参数')
-            else:
-                print('非法指令, 正确指令为: dump config {-d|-c} file_path')
+            try:
+                export_config: Config = None
+                if config_option == '-d':
+                    export_config = init_defualt_config()
+                elif config_option == '-c':
+                    export_config = GLOBAL_CONFIG
+                else:
+                    print('非法指令, 正确指令为: dump config {-d|-c} file_path')
+                    return
+                file_path = os.path.abspath(next(it))
+                ensure_directory_exists(file_path)
+                with open(file_path, 'w', encoding='utf-8') as configfile:
+                    export_config.to_ini_template().write(configfile)
+                print(f'导出位置:{file_path}')
+            except Exception as e:
+                print(f'导出配置时发生错误: {e}')
         elif opreator == 'show':
             config_option = next(it)
             if config_option == '-d':
-                # show defualt config
                 default_config = init_defualt_config()
                 op(default_config)
             elif config_option == '-c':
-                # show current config
                 op(GLOBAL_CONFIG)
             else:
                 print('非法指令, 正确指令为: dump show {-d|-c}')
