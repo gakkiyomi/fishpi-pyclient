@@ -68,11 +68,10 @@ class EnterChatroom(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         curr_user = api.sockpuppets[api.current_user]
         if ChatRoom.WS_URL in curr_user.ws:
-            print("已在聊天室中")
-        else:
-            cr = ChatRoom()
-            curr_user.ws[ChatRoom.WS_URL] = cr
-            cr.start()
+            curr_user.ws[ChatRoom.WS_URL].stop()
+        cr = ChatRoom()
+        curr_user.ws[ChatRoom.WS_URL] = cr
+        cr.start()
 
 
 class SiGuoYa(Command):
