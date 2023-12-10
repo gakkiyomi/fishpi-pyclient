@@ -62,6 +62,7 @@ python core.py
   - 🌛 发送清风明月
   - 聊天室消息撤回
   - 小尾巴去除
+  - 小冰天气解析
   - 🧠 自言自语
     - 自定义语句池
     - 定时发送
@@ -78,6 +79,7 @@ python core.py
     - 查看当前活跃度
     - 查看在线用户列表
     - 查询用户详细信息
+    - 配置文件导出
     - 🈲️ 小黑屋功能
       - 拒绝接收黑名单在聊天室发送的信息 (红包除外 😂 )
       - 将某人从小黑屋中放出
@@ -98,6 +100,7 @@ python core.py
 ## 效果
 
 ![fenshen.png](https://file.fishpi.cn/2023/12/账号分身-0a25be81.png)
+![截屏2023-12-10-13.42.17.png](https://file.fishpi.cn/2023/12/截屏20231210134217-df6839af.png)
 ![image.png](https://file.fishpi.cn/2023/06/image-d4da9bf7.png)
 ![redpacket](https://file.fishpi.cn/2023/06/image-d0ad7756.png)
 ![image.png](https://pwl.stackoverflow.wiki/2022/01/image-f74aae7e.png)
