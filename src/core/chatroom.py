@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import random
+import re
 from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import parse_qs, urlparse
 
 import schedule
+from prettytable import PrettyTable
 from termcolor import colored
 
 from src.api import API, FishPi
@@ -119,7 +122,31 @@ def remove_msg_tail(message: dict) -> str:
     ]
     if message["userName"] == 'b':
         return message['md']
-    lines = message['md'].split('\n')
-    new_lines = [line for line in lines if not any(line.startswith(prefix) or line.strip(
-    ) == prefix or prefix in line for prefix in excluded_prefixes) and not any(substring in line for substring in excluded_substrings) and line != '']
-    return '\n'.join(new_lines)
+    lines: list[str] = [
+        line for line in message['md'].split('\n') if line != '']
+    new_lines = [line for line in lines if not any(line.strip().startswith(
+        prefix) for prefix in excluded_prefixes) and not any(substring in line for substring in excluded_substrings)]
+    return renderWeather(message["userName"], new_lines)
+
+
+def renderWeather(username: str, lines: list[str]) -> str:
+    if username != 'xiaoIce':
+        return '\n'.join(lines)
+    for index in range(len(lines)):
+        match = re.search(r'src="(.*?)"', lines[index])
+        if match:
+            src_url = match.group(1)
+            parsed_url = urlparse(src_url)
+            data = parse_qs(parsed_url.query)
+            data['date'] = data['date'][0].split(',')
+            data['weatherCode'] = data['weatherCode'][0].split(',')
+            data['max'] = data['max'][0].split(',')
+            data['min'] = data['min'][0].split(',')
+            table = PrettyTable()
+            table.title = data.pop('t')[0] + ' ' + data.pop('st')[0]
+            table.field_names = list(data.keys())
+            for i in range(len(data['date'])):
+                row_data = [data[key][i] for key in data.keys()]
+                table.add_row(row_data)
+            lines[index] = table.get_string()
+    return '\n'.join(lines)
