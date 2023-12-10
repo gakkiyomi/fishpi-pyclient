@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import configparser
+
 from src.utils import HOST
 
 
@@ -14,6 +16,18 @@ class RedPacketConfig(object):
         self.rate = rate
         self.rps_limit = rps_limit
 
+    def to_config(self) -> dict:
+        return {
+            'openRedPacket': str(self.red_packet_switch),
+            'rate': str(self.rate),
+            'rpsLimit': str(self.rps_limit),
+            'heartbeat': str(self.heartbeat),
+            'heartbeatSmartMode': str(self.smart_mode),
+            'heartbeatThreshold': str(self.threshold),
+            'heartbeatTimeout': str(self.timeout),
+            'heartbeatAdventure': str(self.adventure_mode),
+        }
+
 
 class AuthConfig(object):
     def __init__(self, username='', password='', mfa_code='', key=''):
@@ -26,10 +40,24 @@ class AuthConfig(object):
     def add_account(self, username='', password=''):
         self.accounts.append((username, password))
 
+    def to_config(self) -> dict:
+        usernames = ''
+        passwords = ''
+        if len(self.accounts) != 0:
+            usernames = ",".join(username for username, _ in self.accounts)
+            usernames = ",".join(password for password, _ in self.accounts)
+        return {
+            'username': self.username,
+            'password': self.password,
+            'key': self.key,
+            'sockpuppet_usernames': usernames,
+            'sockpuppet_passwords': passwords
+        }
+
 
 class ChatConfig(object):
-    def __init__(self, blacklist=[], kw_blacklist=['你点的歌来了'], repeat_mode_switch=False, frequency=5, soliloquize_switch=False,
-                 soliloquize_frequency=20, sentences=[], answer_mode: bool = False, fish_ball: str = '凌 捞鱼丸',
+    def __init__(self, blacklist: list[str] = [], kw_blacklist: list[str] = ['你点的歌来了'], repeat_mode_switch=False, frequency=5, soliloquize_switch=False,
+                 soliloquize_frequency=20, sentences: list[str] = [], answer_mode: bool = False, fish_ball: str = '凌 捞鱼丸',
                  chat_user_color: str | None = None, chat_content_color: str | None = None):
         self.repeat_mode_switch = repeat_mode_switch
         self.frequency = frequency
@@ -44,6 +72,27 @@ class ChatConfig(object):
         self.chat_user_color = chat_user_color
         self.chat_content_color = chat_content_color
 
+    def to_config(self) -> dict:
+        res = {
+            'fishBall': str(self.fish_ball),
+            'repeatMode': str(self.repeat_mode_switch),
+            'answerMode': str(self.answer_mode),
+            'repeatFrequency': str(self.frequency),
+            'soliloquizeMode': str(self.soliloquize_switch),
+            'soliloquizeFrequency': str(self.soliloquize_frequency),
+            'sentences': '[' + ",".join('\"'+item+'\"' for item in self.sentences) + ']',
+            'blacklist': '[' + ",".join('\"'+item+'\"' for item in self.blacklist) + ']',
+            'kwBlacklist': '[' + ",".join('\"'+item+'\"' for item in self.kw_blacklist) + ']',
+            'chatUserColor': self.chat_user_color,
+            'chatContentColor': self.chat_content_color
+        }
+
+        if self.chat_user_color is None:
+            res['chatUserColor'] = ''
+        if self.chat_user_color is None:
+            res['chatContentColor'] = ''
+        return res
+
 
 class Config(object):
     def __init__(self, auth: AuthConfig = None, redpacket: RedPacketConfig = None, chat: ChatConfig = None, cfg_path: str = None, host: str = 'https://fishpi.cn'):
@@ -52,6 +101,13 @@ class Config(object):
         self.chat_config = chat
         self.cfg_path = cfg_path
         self.host = host
+
+    def to_ini_template(self) -> configparser.ConfigParser:
+        config = configparser.ConfigParser()
+        config['auth'] = self.auth_config.to_config()
+        config['redPacket'] = self.redpacket_config.to_config()
+        config['chat'] = self.chat_config.to_config()
+        return config
 
 
 class CliOptions(object):
