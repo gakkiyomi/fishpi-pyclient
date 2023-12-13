@@ -38,6 +38,9 @@ class Article(object):
 
 
 class ArticleAPI(Base):
+    oId = []
+    title = []
+
     def vote_for_article(self, article_id: str) -> None:
         if self.api_key == '':
             return None
@@ -70,7 +73,7 @@ class ArticleAPI(Base):
 
     def list_articles(self, type: ArticleType = ArticleType.RECENT, page: int = 1, size: int = 20) -> dict:
         res = requests.get(
-            f'{GLOBAL_CONFIG.host}/api/articles/{type}?p={page}&size={size}', headers={'User-Agent': UA}, json={
+            f'{GLOBAL_CONFIG.host}/api/articles/{type.value}?p={page}&size={size}', headers={'User-Agent': UA}, json={
                 'apiKey': self.api_key
             })
         response = json.loads(res.text)
@@ -86,9 +89,37 @@ class ArticleAPI(Base):
             })
         response = json.loads(res.text)
         if 'code' in response and response['code'] == 0:
+            # print(Article(response['data']))
             return Article(response['data'])
         else:
             print('获取帖子详情失败: ' + response['msg'])
+
+    def get_content(self, article_id: str) -> None:
+        all_content = self.get_article(article_id).article
+        print("\n"+all_content["articleOriginalContent"])
+
+    def get_author(self, article_id: str) -> str:
+        all_content = self.get_article(article_id).article
+        author_name = all_content["articleAuthor"].get("userNickname", "")
+        return author_name if author_name != '' else all_content["articleAuthor"]["userName"]
+
+    def format_article_list(self, article_list: list) -> None:
+        grey_highlight = '\033[1;30;1m'
+        green_bold = '\033[1;32;1m'
+        reset_color = '\033[0m'
+
+        formatted_articles = []
+
+        for index, article in enumerate(article_list):
+            author_name = article["articleAuthor"].get("userNickname", "")
+            author_name = author_name if author_name != "" else article["articleAuthor"]["userName"]
+            colored_name = f'{grey_highlight}{author_name}{reset_color}'
+            colored_comments = f'{green_bold}{article["articleCommentCount"]}{reset_color}'
+            self.oId.append(article["oId"])
+            formatted_article = f'{str(index + 1).zfill(2)}.[{colored_name}] {article["articleTitle"]} {colored_comments}'
+            self.title.append(formatted_article)
+            formatted_articles.append(formatted_article)
+            print(formatted_article)
 
     def comment_article(self, article_id: str, comment: str) -> Article:
         res = requests.post(f'{GLOBAL_CONFIG.host}/comment/{article_id}', headers={'User-Agent': UA}, json={
