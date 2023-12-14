@@ -3,6 +3,7 @@ import os
 import re
 from abc import ABC, abstractmethod
 from typing import Tuple
+
 from objprint import op
 
 from src.api import FishPi, UserInfo
@@ -88,10 +89,9 @@ class Article(Command):
         elif lt[0] == "page":
             try:
                 api.article.oId.clear()
-                api.article.title.clear()
-
                 page_index = int(lt[1])
-                article_list = api.article.list_articles(page=page_index)['data']['articles']
+                article_list = api.article.list_articles(
+                    page=page_index)['data']['articles']
                 api.article.format_article_list(article_list)
             except Exception:
                 print("参数错误，#article page {int}")
@@ -99,17 +99,23 @@ class Article(Command):
         elif len(lt) > 1 and lt[0] == "view":
             try:
                 article_index = int(lt[1])
+                if (article_index <= 0):
+                    print("页数必须大于0")
+                    return
                 if 0 <= article_index < len(api.article.oId):
                     article_id = api.article.oId[article_index - 1]
-                    api.article.get_content(article_id)
-                    print(f"[*** 当前帖子:{api.article.title[article_index - 1]} ***]\n")
+                    article = api.article.get_article(article_id)
+                    article.get_content()
+                    print(f"[*** 当前帖子:{article.get_tittle()} ***]\n")
 
                 elif len(api.article.oId) < 1:
-                    article_list = api.article.list_articles()['data']['articles']
+                    article_list = api.article.list_articles()[
+                        'data']['articles']
                     api.article.format_article_list(article_list)
                     article_id = api.article.oId[article_index - 1]
-                    api.article.get_content(article_id)
-                    print(f"[*** 当前帖子:{api.article.title[article_index - 1]} ***]\n")
+                    article = api.article.get_article(article_id)
+                    article.get_content()
+                    print(f"[*** 当前帖子:{article.get_tittle()} ***]\n")
 
                 else:
                     print("找不到对应编号或索引的文章")
