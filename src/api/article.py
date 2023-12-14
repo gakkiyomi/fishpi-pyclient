@@ -36,10 +36,19 @@ class Article(object):
     def comment(self, api, comment: str) -> None:
         api.comment_article(self.oId, comment)
 
+    def get_content(self) -> None:
+        print("\n"+self.articleOriginalContent)
+
+    def get_author(self) -> str:
+        author_name = self.articleAuthor.get("userNickname", "")
+        return author_name if author_name != '' else self.articleAuthor["userName"]
+
+    def get_tittle(self) -> str:
+        return self.articleTitle
+
 
 class ArticleAPI(Base):
     oId = []
-    title = []
 
     def vote_for_article(self, article_id: str) -> None:
         if self.api_key == '':
@@ -90,25 +99,14 @@ class ArticleAPI(Base):
         response = json.loads(res.text)
         if 'code' in response and response['code'] == 0:
             # print(Article(response['data']))
-            return Article(response['data'])
+            return Article(response['data']['article'])
         else:
             print('获取帖子详情失败: ' + response['msg'])
 
-    def get_content(self, article_id: str) -> None:
-        all_content = self.get_article(article_id).article
-        print("\n"+all_content["articleOriginalContent"])
-
-    def get_author(self, article_id: str) -> str:
-        all_content = self.get_article(article_id).article
-        author_name = all_content["articleAuthor"].get("userNickname", "")
-        return author_name if author_name != '' else all_content["articleAuthor"]["userName"]
-
-    def format_article_list(self, article_list: list) -> None:
+    def format_article_list(self, article_list: list[dict[str, Any]]) -> None:
         grey_highlight = '\033[1;30;1m'
         green_bold = '\033[1;32;1m'
         reset_color = '\033[0m'
-
-        formatted_articles = []
 
         for index, article in enumerate(article_list):
             author_name = article["articleAuthor"].get("userNickname", "")
@@ -117,8 +115,6 @@ class ArticleAPI(Base):
             colored_comments = f'{green_bold}{article["articleCommentCount"]}{reset_color}'
             self.oId.append(article["oId"])
             formatted_article = f'{str(index + 1).zfill(2)}.[{colored_name}] {article["articleTitle"]} {colored_comments}'
-            self.title.append(formatted_article)
-            formatted_articles.append(formatted_article)
             print(formatted_article)
 
     def comment_article(self, article_id: str, comment: str) -> Article:
