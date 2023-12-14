@@ -3,7 +3,6 @@ import os
 import re
 from abc import ABC, abstractmethod
 from typing import Tuple
-
 from objprint import op
 
 from src.api import FishPi, UserInfo
@@ -77,6 +76,45 @@ class EnterChatroom(Command):
 class SiGuoYa(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         api.chatroom.siguoya()
+
+
+class Article(Command):
+    def exec(self, api: FishPi, args: Tuple[str, ...]):
+        lt = [i for i in args]
+        if len(lt) == 0:
+            article_list = api.article.list_articles()['data']['articles']
+            api.article.format_article_list(article_list)
+
+        elif lt[0] == "page":
+            try:
+                api.article.oId.clear()
+                api.article.title.clear()
+
+                page_index = int(lt[1])
+                article_list = api.article.list_articles(page=page_index)['data']['articles']
+                api.article.format_article_list(article_list)
+            except Exception:
+                print("参数错误，#article page {int}")
+
+        elif len(lt) > 1 and lt[0] == "view":
+            try:
+                article_index = int(lt[1])
+                if 0 <= article_index < len(api.article.oId):
+                    article_id = api.article.oId[article_index - 1]
+                    api.article.get_content(article_id)
+                    print(f"[*** 当前帖子:{api.article.title[article_index - 1]} ***]\n")
+
+                elif len(api.article.oId) < 1:
+                    article_list = api.article.list_articles()['data']['articles']
+                    api.article.format_article_list(article_list)
+                    article_id = api.article.oId[article_index - 1]
+                    api.article.get_content(article_id)
+                    print(f"[*** 当前帖子:{api.article.title[article_index - 1]} ***]\n")
+
+                else:
+                    print("找不到对应编号或索引的文章")
+            except Exception:
+                print("参数错误，#article view {int}")
 
 
 class AnswerMode(Command):
@@ -379,6 +417,7 @@ def init_cli(api: FishPi):
     cli_handler.add_command('#cli', EnterCil())
     cli_handler.add_command('#chatroom', EnterChatroom())
     cli_handler.add_command('#siguo', SiGuoYa())
+    cli_handler.add_command('#article', Article())
     cli_handler.add_command('#bm', BreezemoonsCommand())
     cli_handler.add_command('#config', ConfigCommand())
     cli_handler.add_command('#transfer', PointTransferCommand())
