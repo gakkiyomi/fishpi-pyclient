@@ -80,6 +80,8 @@ class SiGuoYa(Command):
 
 
 class Article(Command):
+    oId = ''
+
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         lt = [i for i in args]
         if len(lt) == 0:
@@ -99,14 +101,16 @@ class Article(Command):
         elif len(lt) > 1 and lt[0] == "view":
             try:
                 article_index = int(lt[1])
-                if (article_index <= 0):
+                if article_index <= 0:
                     print("页数必须大于0")
                     return
                 if 0 <= article_index < len(api.article.oId):
                     article_id = api.article.oId[article_index - 1]
                     article = api.article.get_article(article_id)
                     article.get_content()
-                    print(f"[*** 当前帖子:{article.get_tittle()} ***]\n")
+                    self.oId = article.oId
+                    api.article.format_comments_list(article.get_articleComments())
+                    print(f"\n[*** 当前帖子:{article.get_tittle()} ***]\n")
 
                 elif len(api.article.oId) < 1:
                     article_list = api.article.list_articles()[
@@ -115,12 +119,18 @@ class Article(Command):
                     article_id = api.article.oId[article_index - 1]
                     article = api.article.get_article(article_id)
                     article.get_content()
-                    print(f"[*** 当前帖子:{article.get_tittle()} ***]\n")
+                    self.oId = article.oId
+                    api.article.format_comments_list(article.get_articleComments())
+                    print(f"\n[*** 当前帖子:{article.get_tittle()} ***]\n")
 
                 else:
                     print("找不到对应编号或索引的文章")
             except Exception:
                 print("参数错误，#article view {int}")
+
+        elif len(lt) > 1 and lt[0] == "comment":
+            comment_content = lt[1]
+            api.article.comment_article(self.oId, comment_content)
 
 
 class AnswerMode(Command):

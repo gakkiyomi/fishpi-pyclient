@@ -11,6 +11,9 @@ from src.utils import UA
 
 from .config import GLOBAL_CONFIG
 
+from bs4 import BeautifulSoup
+import html2text
+
 
 class ArticleType(Enum):
     RECENT = 'recent'
@@ -37,7 +40,7 @@ class Article(object):
         api.comment_article(self.oId, comment)
 
     def get_content(self) -> None:
-        print("\n"+self.articleOriginalContent)
+        print(f"\n" + self.articleOriginalContent)
 
     def get_author(self) -> str:
         author_name = self.articleAuthor.get("userNickname", "")
@@ -45,6 +48,9 @@ class Article(object):
 
     def get_tittle(self) -> str:
         return self.articleTitle
+
+    def get_articleComments(self) -> list[dict[str, Any]]:
+        return self.articleComments
 
 
 class ArticleAPI(Base):
@@ -107,10 +113,9 @@ class ArticleAPI(Base):
         grey_highlight = '\033[1;30;1m'
         green_bold = '\033[1;32;1m'
         reset_color = '\033[0m'
-
+        print(f'\n{"*" * 30} (文章列表) {"*" * 30}\n')
         for index, article in enumerate(article_list):
-            author_name = article["articleAuthor"].get("userNickname", "")
-            author_name = author_name if author_name != "" else article["articleAuthor"]["userName"]
+            author_name = article["articleAuthor"].get("userNickname", "") or article["articleAuthor"]["userName"]
             colored_name = f'{grey_highlight}{author_name}{reset_color}'
             colored_comments = f'{green_bold}{article["articleCommentCount"]}{reset_color}'
             self.oId.append(article["oId"])
@@ -118,7 +123,7 @@ class ArticleAPI(Base):
             print(formatted_article)
 
     def comment_article(self, article_id: str, comment: str) -> Article:
-        res = requests.post(f'{GLOBAL_CONFIG.host}/comment/{article_id}', headers={'User-Agent': UA}, json={
+        res = requests.post(f"{GLOBAL_CONFIG.host}/comment", headers={'User-Agent': UA}, json={
             'apiKey': self.api_key,
             'articleId': article_id,
             'commentAnonymous': False,
@@ -130,3 +135,18 @@ class ArticleAPI(Base):
             print('评论成功')
         else:
             print('评论失败: ' + response['msg'])
+
+    def format_comments_list(self, comments_list: list[dict[str, Any]]) -> None:
+        green_bold = '\033[1;32;1m'
+        reset_color = '\033[0m'
+        yellow = '\x1B[33m'
+
+        print(f"{yellow}[{'*' * 60} (评论区) {'*' * 60}]{reset_color}\n")
+        for index, commenter in enumerate(comments_list):
+            comment_name = commenter["commenter"].get("userNickname", "") or commenter["commenter"]["userName"]
+            soup = BeautifulSoup(commenter["commentContent"], 'html.parser')
+            text_maker = html2text.HTML2Text()
+            text = text_maker.handle(str(soup))
+            print(f"{str(index + 1).zfill(2)}.{green_bold}[{comment_name}({commenter['commenter']['userName']})]{reset_color}:{text}")
+        print(f'{yellow}{"*" * 120}{reset_color}')
+
