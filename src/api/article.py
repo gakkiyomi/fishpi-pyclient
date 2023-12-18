@@ -2,7 +2,7 @@
 
 import json
 from enum import Enum
-from typing import Any
+from typing import Any, Union
 
 import requests
 
@@ -53,7 +53,9 @@ class Article(object):
 
 
 class ArticleAPI(Base):
-    oId = []
+    def __init__(self):
+        super().__init__()
+        self.articles: List[dict] = []
 
     def vote_for_article(self, article_id: str) -> None:
         if self.api_key == '':
@@ -92,7 +94,8 @@ class ArticleAPI(Base):
             })
         response = json.loads(res.text)
         if 'code' in response and response['code'] == 0:
-            return response
+            self.articles = response["data"]["articles"]
+            return response["data"]["articles"]
         else:
             print('获取帖子列表失败: ' + response['msg'])
 
@@ -117,7 +120,6 @@ class ArticleAPI(Base):
             author_name = article["articleAuthor"].get("userNickname", "") or article["articleAuthor"]["userName"]
             colored_name = f'{grey_highlight}{author_name}{reset_color}'
             colored_comments = f'{green_bold}{article["articleCommentCount"]}{reset_color}'
-            self.oId.append(article["oId"])
             formatted_article = f'{str(index + 1).zfill(2)}.[{colored_name}] {article["articleTitle"]} {colored_comments}'
             print(formatted_article)
 
@@ -148,3 +150,9 @@ class ArticleAPI(Base):
             text = text_maker.handle(str(soup))
             print(f"{str(index + 1).zfill(2)}.{green_bold}[{comment_name}({commenter['commenter']['userName']})]{reset_color}:{text}")
         print(f'{yellow}{"*" * 120}{reset_color}')
+
+    def articles_oid(self, index: int = None) -> Union[list[str], str]:
+        if index is None:
+            return [oid["oId"] for oid in self.articles]
+        else:
+            return self.articles[index - 1]["oId"]

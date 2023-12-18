@@ -6,3 +6,5 @@ objprint==0.2.3
 colorama==0.4.6
 termcolor==2.4.0
 prettytable==3.9.0
+bs4==0.0.1
+html2text==2020.1.16
