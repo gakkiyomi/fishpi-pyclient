@@ -130,6 +130,7 @@ class ArticleCommand(Command):
 
         elif len(lt) > 1 and lt[0] == "comment":
             comment_content = lt[1]
+
             try:
                 api.article.comment_article(self.curr_article.oId, comment_content)
             except Exception:
