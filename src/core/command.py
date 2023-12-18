@@ -81,21 +81,20 @@ class SiGuoYa(Command):
 
 
 class ArticleCommand(Command):
-    def __init__(self, article: Article) -> None:
+    def __init__(self, article: Article = None) -> None:
         self.curr_article = article
 
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         lt = [i for i in args]
         if len(lt) == 0:
-            article_list = api.article.list_articles()['data']['articles']
+            article_list = api.article.list_articles()
             api.article.format_article_list(article_list)
 
         elif lt[0] == "page":
             try:
-                api.article.oId.clear()
                 page_index = int(lt[1])
                 article_list = api.article.list_articles(
-                    page=page_index)['data']['articles']
+                    page=page_index)
                 api.article.format_article_list(article_list)
             except Exception:
                 print("参数错误，#article page {int}")
@@ -106,21 +105,18 @@ class ArticleCommand(Command):
                 if article_index <= 0:
                     print("页数必须大于0")
                     return
-                if 0 <= article_index < len(api.article.oId):
-                    article_id = api.article.oId[article_index - 1]
-                    article = api.article.get_article(article_id)
+                if 0 <= article_index < len(api.article.articles_oid()):
+                    article = api.article.get_article(api.article.articles_oid(article_index))
                     article.get_content()
                     self.curr_article = article
                     api.article.format_comments_list(
                         article.get_articleComments())
                     print(f"\n[*** 当前帖子:{article.get_tittle()} ***]\n")
 
-                elif len(api.article.oId) < 1:
-                    article_list = api.article.list_articles()[
-                        'data']['articles']
+                elif len(api.article.articles_oid()) < 1:
+                    article_list = api.article.list_articles()
                     api.article.format_article_list(article_list)
-                    article_id = api.article.oId[article_index - 1]
-                    article = api.article.get_article(article_id)
+                    article = api.article.get_article(api.article.articles_oid(article_index))
                     article.get_content()
                     self.curr_article = article
                     api.article.format_comments_list(
@@ -134,7 +130,11 @@ class ArticleCommand(Command):
 
         elif len(lt) > 1 and lt[0] == "comment":
             comment_content = lt[1]
-            api.article.comment_article(self.curr_article.oId, comment_content)
+
+            try:
+                api.article.comment_article(self.curr_article.oId, comment_content)
+            except Exception:
+                print("选择需要评论的帖子")
 
 
 class AnswerMode(Command):
