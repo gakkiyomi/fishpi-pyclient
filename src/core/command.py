@@ -7,6 +7,7 @@ from typing import Tuple
 from objprint import op
 
 from src.api import FishPi, UserInfo
+from src.api.article import Article
 from src.api.config import GLOBAL_CONFIG, Config, init_defualt_config
 from src.api.redpacket import RedPacket, RedPacketType, RPSRedPacket, SpecifyRedPacket
 from src.utils import (
@@ -77,6 +78,63 @@ class EnterChatroom(Command):
 class SiGuoYa(Command):
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         api.chatroom.siguoya()
+
+
+class ArticleCommand(Command):
+    def __init__(self, article: Article = None) -> None:
+        self.curr_article = article
+
+    def exec(self, api: FishPi, args: Tuple[str, ...]):
+        lt = [i for i in args]
+        if len(lt) == 0:
+            article_list = api.article.list_articles()
+            api.article.format_article_list(article_list)
+
+        elif lt[0] == "page":
+            try:
+                page_index = int(lt[1])
+                article_list = api.article.list_articles(
+                    page=page_index)
+                api.article.format_article_list(article_list)
+            except Exception:
+                print("参数错误，#article page {int}")
+
+        elif len(lt) > 1 and lt[0] == "view":
+            try:
+                article_index = int(lt[1])
+                if article_index <= 0:
+                    print("页数必须大于0")
+                    return
+                if 0 <= article_index < len(api.article.articles_oid()):
+                    article = api.article.get_article(api.article.articles_oid(article_index))
+                    article.get_content()
+                    self.curr_article = article
+                    api.article.format_comments_list(
+                        article.get_articleComments())
+                    print(f"\n[*** 当前帖子:{article.get_tittle()} ***]\n")
+
+                elif len(api.article.articles_oid()) < 1:
+                    article_list = api.article.list_articles()
+                    api.article.format_article_list(article_list)
+                    article = api.article.get_article(api.article.articles_oid(article_index))
+                    article.get_content()
+                    self.curr_article = article
+                    api.article.format_comments_list(
+                        article.get_articleComments())
+                    print(f"\n[*** 当前帖子:{article.get_tittle()} ***]\n")
+
+                else:
+                    print("找不到对应编号或索引的文章")
+            except Exception:
+                print("参数错误，#article view {int}")
+
+        elif len(lt) > 1 and lt[0] == "comment":
+            comment_content = lt[1]
+
+            try:
+                api.article.comment_article(self.curr_article.oId, comment_content)
+            except Exception:
+                print("选择需要评论的帖子")
 
 
 class AnswerMode(Command):
@@ -379,6 +437,7 @@ def init_cli(api: FishPi):
     cli_handler.add_command('#cli', EnterCil())
     cli_handler.add_command('#chatroom', EnterChatroom())
     cli_handler.add_command('#siguo', SiGuoYa())
+    cli_handler.add_command('#article', ArticleCommand())
     cli_handler.add_command('#bm', BreezemoonsCommand())
     cli_handler.add_command('#config', ConfigCommand())
     cli_handler.add_command('#transfer', PointTransferCommand())
