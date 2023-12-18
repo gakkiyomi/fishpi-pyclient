@@ -7,6 +7,7 @@ from typing import Tuple
 from objprint import op
 
 from src.api import FishPi, UserInfo
+from src.api.article import Article
 from src.api.config import GLOBAL_CONFIG, Config, init_defualt_config
 from src.api.redpacket import RedPacket, RedPacketType, RPSRedPacket, SpecifyRedPacket
 from src.utils import (
@@ -79,7 +80,10 @@ class SiGuoYa(Command):
         api.chatroom.siguoya()
 
 
-class Article(Command):
+class ArticleCommand(Command):
+    def __init__(self, article: Article) -> None:
+        self.curr_article = article
+
     def exec(self, api: FishPi, args: Tuple[str, ...]):
         lt = [i for i in args]
         if len(lt) == 0:
@@ -106,8 +110,9 @@ class Article(Command):
                     article_id = api.article.oId[article_index - 1]
                     article = api.article.get_article(article_id)
                     article.get_content()
-                    self.oId = article.oId
-                    api.article.format_comments_list(article.get_articleComments())
+                    self.curr_article = article
+                    api.article.format_comments_list(
+                        article.get_articleComments())
                     print(f"\n[*** 当前帖子:{article.get_tittle()} ***]\n")
 
                 elif len(api.article.oId) < 1:
@@ -117,8 +122,9 @@ class Article(Command):
                     article_id = api.article.oId[article_index - 1]
                     article = api.article.get_article(article_id)
                     article.get_content()
-                    self.oId = article.oId
-                    api.article.format_comments_list(article.get_articleComments())
+                    self.curr_article = article
+                    api.article.format_comments_list(
+                        article.get_articleComments())
                     print(f"\n[*** 当前帖子:{article.get_tittle()} ***]\n")
 
                 else:
@@ -128,7 +134,7 @@ class Article(Command):
 
         elif len(lt) > 1 and lt[0] == "comment":
             comment_content = lt[1]
-            api.article.comment_article(self.oId, comment_content)
+            api.article.comment_article(self.curr_article.oId, comment_content)
 
 
 class AnswerMode(Command):
@@ -431,7 +437,7 @@ def init_cli(api: FishPi):
     cli_handler.add_command('#cli', EnterCil())
     cli_handler.add_command('#chatroom', EnterChatroom())
     cli_handler.add_command('#siguo', SiGuoYa())
-    cli_handler.add_command('#article', Article())
+    cli_handler.add_command('#article', ArticleCommand())
     cli_handler.add_command('#bm', BreezemoonsCommand())
     cli_handler.add_command('#config', ConfigCommand())
     cli_handler.add_command('#transfer', PointTransferCommand())

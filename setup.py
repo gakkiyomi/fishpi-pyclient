@@ -25,7 +25,7 @@ VERSION = __version__
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'requests', 'websocket-client', 'click', 'schedule', 'objprint', 'colorama', 'termcolor', 'prettytable'
+    'requests', 'websocket-client', 'click', 'schedule', 'objprint', 'colorama', 'termcolor', 'prettytable', 'bs4', 'html2text'
 ]
 
 # What packages are optional?
